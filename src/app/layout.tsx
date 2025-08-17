@@ -4,7 +4,6 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Sender - Ferramenta de Automação",
-  description: "Sender - Ferramenta de Automação",
 };
 
 export default function RootLayout({
