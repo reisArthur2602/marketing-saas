@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Template } from "@prisma/client";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { upsertTemplate } from "../actions/upsert-template";
 import {
   UpsertTemplateForm,
@@ -41,6 +41,7 @@ export const UpsertTemplateDialog = ({
   template,
 }: UpsertTemplateDialogProps) => {
   const isEditing = !!template;
+  const [open, setOpen] = useState(false);
 
   const methods = useForm<UpsertTemplateForm>({
     resolver: zodResolver(upsertTemplateSchema),
@@ -58,10 +59,12 @@ export const UpsertTemplateDialog = ({
     });
 
     toast.success(isEditing ? "Template atualizado!" : "Template criado!");
+    methods.reset();
+    setOpen(false);
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>

@@ -39,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${inter.className} dark`}>
-        <Toaster expand />
+        <Toaster theme="dark" expand />
         {children}
       </body>
     </html>
