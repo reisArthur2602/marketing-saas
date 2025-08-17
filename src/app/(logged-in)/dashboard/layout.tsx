@@ -2,8 +2,8 @@ import { Logo } from "@/components/shared/logo";
 import { currentUser } from "@/lib/auth-js";
 import { redirect } from "next/navigation";
 import { PropsWithChildren } from "react";
-import { AvatarUser } from "./features/avatar-user";
-import { Navigation } from "./features/navigation";
+import { AvatarUser } from "./(main)/features/avatar-user";
+import { Navigation } from "./(main)/features/navigation";
 
 const DashboardLayout = async ({ children }: PropsWithChildren) => {
   const user = await currentUser();
