@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 const SessionPage = async () => {
   const whatsAppSession = await getWhatsAppSession();
   const connected = !!whatsAppSession?.connected;
-
   return (
     <div className="flex-1 space-y-6">
       <div>
