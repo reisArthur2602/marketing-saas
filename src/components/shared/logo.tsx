@@ -22,7 +22,7 @@ export const Logo = () => {
           </g>
         </g>
       </svg>
-      <div className="text-2xl font-bold tracking-tighter">Sender</div>
+      <div className="text-xl font-semibold tracking-tighter">Sender.io</div>
     </Link>
   );
 };

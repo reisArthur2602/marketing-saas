@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 const AuthPage = () => {
   return (
-    <main className="flex h-full items-center justify-center p-6 md:p-10">
+    <main className="flex flex-1 items-center justify-center p-6 md:p-10">
       <AuthForm />
     </main>
   );

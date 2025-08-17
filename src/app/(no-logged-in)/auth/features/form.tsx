@@ -16,10 +16,12 @@ export const AuthForm = () => {
     <form action={handleLogin} className="flex max-w-sm flex-col gap-6">
       <div>
         <div className="flex flex-col gap-6">
-          <div className="flex flex-col items-center gap-2 text-center">
+          <div className="flex flex-col items-center text-center gap-2">
             <Logo />
-            <h2>Bem-vindo de volta</h2>
-            <p>Acesse sua conta, ou crie gratuitamente</p>
+            <div>
+              <h2>Bem-vindo de volta</h2>
+              <p>Acesse sua conta, ou crie gratuitamente</p>
+            </div>
           </div>
           <div className="flex flex-col gap-4">
             <div className="grid gap-3">

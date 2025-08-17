@@ -10,8 +10,8 @@ const DashboardLayout = async ({ children }: PropsWithChildren) => {
   if (!user) redirect("/");
 
   return (
-    <div className="container mx-auto">
-      <header className="container mx-auto p-6 md:p-10">
+    <div className="container mx-auto flex flex-1 flex-col">
+      <header className="container mx-auto px-4 pt-10">
         <div className="flex items-center justify-between">
           <Logo />
           <AvatarUser user={user} />
@@ -19,7 +19,7 @@ const DashboardLayout = async ({ children }: PropsWithChildren) => {
         <Navigation />
       </header>
 
-      <main className="p-6 md:p-10">{children}</main>
+      <main className="flex-1 px-4 py-10">{children}</main>
     </div>
   );
 };

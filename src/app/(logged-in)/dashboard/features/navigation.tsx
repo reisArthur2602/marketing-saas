@@ -14,11 +14,13 @@ import {
 } from "@/components/ui/popover";
 
 const navigationLinks = [
-  { href: "#", label: "Início", active: true },
+  { href: "#", label: "Início" },
+  { href: "/dashboard/settings", label: "Configurações" },
+  { href: "#", label: "Campanhas" },
   { href: "#", label: "Templates" },
   { href: "#", label: "Palavras-chave" },
-  { href: "#", label: "Campanhas" },
-  { href: "#", label: "Sessão" },
+
+  { href: "/dashboard/session", label: "Sessão", active: true },
 ];
 
 export const Navigation = () => {

@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Sender - Ferramenta de Automação",
+  title: "Sender.io - Ferramenta de Automação",
 };
 
 export default function RootLayout({
