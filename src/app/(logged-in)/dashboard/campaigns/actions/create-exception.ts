@@ -4,25 +4,31 @@ import { currentUser } from "@/lib/auth-js";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-interface CreateKeywordProps {
-  word: string;
+interface CreateExceptionProps {
+  description?: string;
+  date: Date;
 }
-export const createKeyword = async ({ word }: CreateKeywordProps) => {
+
+export const createException = async ({
+  description,
+  date,
+}: CreateExceptionProps) => {
   const user = await currentUser();
   try {
-    const keyword = await prisma.keyword.create({
+    const exception = await prisma.exception.create({
       data: {
-        word,
+        description,
+        date,
         userId: user?.id as string,
       },
     });
     revalidatePath("/dashboard/campaigns");
     return {
       success: true,
-      data: keyword,
+      data: exception,
       message: {
-        title: "Palavra-chave adicionada",
-        description: `"${word}" foi adicionada com sucesso.`,
+        title: "Exceção adicionada",
+        description: `Data ${date.toLocaleDateString("pt-BR")} foi adicionada com sucesso.`,
       },
     };
   } catch (error) {
@@ -31,8 +37,8 @@ export const createKeyword = async ({ word }: CreateKeywordProps) => {
       success: false,
       data: null,
       message: {
-        title: "Palavra-chave já existe",
-        description: "Esta palavra-chave já foi cadastrada.",
+        title: "Erro ao adicionar",
+        description: "Tente novamente em alguns instantes.",
       },
     };
   }
