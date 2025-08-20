@@ -21,19 +21,20 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { ReactNode } from "react";
+import { ReactNode, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-import { Calendar, Tags, Trash2 } from "lucide-react";
+import { Calendar, MessageSquare, Tags, Trash2 } from "lucide-react";
 import {
   createExceptionSchema,
   CreateExceptionSchemaForm,
 } from "../schema/create-exception-schema";
 import { Exception } from "@prisma/client";
 import { createException } from "../actions/create-exception";
+import { deleteException } from "../actions/delete-exception";
 
 interface ManageExceptionsSheetProps {
   exceptions: Exception[];
@@ -52,6 +53,8 @@ export const ManageExceptionsSheet = ({
     },
   });
 
+  const [isPending, startTransition] = useTransition();
+
   const handleCreateExceptions = async (data: CreateExceptionSchemaForm) => {
     const { success, message } = await createException(data);
     if (!success) {
@@ -60,6 +63,17 @@ export const ManageExceptionsSheet = ({
     }
     methods.reset();
     toast.success(message.title, { description: message.description });
+  };
+
+  const handleDelete = (id: string) => {
+    startTransition(async () => {
+      const { success, message } = await deleteException(id);
+      if (!success) {
+        toast.error(message.title, { description: message.description });
+        return;
+      }
+      toast.success(message.title, { description: message.description });
+    });
   };
 
   return (
@@ -126,32 +140,41 @@ export const ManageExceptionsSheet = ({
 
         <div className="space-y-3">
           <Label>Datas de Exceção Cadastradas</Label>
-          <div className="max-h-[400px] space-y-2 overflow-y-auto">
-            {exceptions.map((exception) => (
-              <div
-                key={exception.id}
-                className="border-border bg-card flex items-center justify-between rounded-lg border p-4"
-              >
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium">
-                    {new Date(exception.date).toLocaleDateString("pt-BR")}
-                  </span>
-                  {exception.description && (
-                    <span className="text-muted-foreground text-xs">
-                      {exception.description}
-                    </span>
-                  )}
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-destructive h-8 w-8"
+          {exceptions.length === 0 ? (
+            <div className="border-border text-muted-foreground bg-card flex flex-col items-center justify-center gap-2 rounded-lg border p-6 text-sm">
+              <MessageSquare className="h-5 w-5" />
+              <span>Nenhuma data de exceção cadastrada.</span>
+            </div>
+          ) : (
+            <div className="max-h-[400px] space-y-2 overflow-y-auto">
+              {exceptions.map((exception) => (
+                <div
+                  key={exception.id}
+                  className="border-border bg-card flex items-center justify-between rounded-lg border p-4"
                 >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-medium">
+                      {new Date(exception.date).toLocaleDateString("pt-BR")}
+                    </span>
+                    {exception.description && (
+                      <span className="text-muted-foreground text-xs">
+                        {exception.description}
+                      </span>
+                    )}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive h-8 w-8"
+                    onClick={() => handleDelete(exception.id)}
+                    disabled={isPending}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </SheetContent>
     </Sheet>

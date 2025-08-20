@@ -21,7 +21,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { ReactNode } from "react";
+import { ReactNode, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import {
   createKeywordSchema,
@@ -32,7 +32,8 @@ import { createKeyword } from "../actions/create-keyword";
 import { toast } from "sonner";
 import { getKeywords } from "../actions/get-keywords";
 import { ReturnAsyncType } from "@/utils/return-async-type";
-import { Tags, Trash2 } from "lucide-react";
+import { MessageSquare, Tags, Trash2 } from "lucide-react";
+import { deleteKeyword } from "../actions/delete-keyword";
 
 interface ManageKeywordsSheetProps {
   keywords: ReturnAsyncType<typeof getKeywords>;
@@ -50,6 +51,8 @@ export const ManageKeywordsSheet = ({
     },
   });
 
+  const [isPending, startTransition] = useTransition();
+
   const word = methods.watch("word");
 
   const handleCreateKeyword = async (data: CreateKeywordSchemaForm) => {
@@ -60,6 +63,17 @@ export const ManageKeywordsSheet = ({
     }
     methods.reset();
     toast.success(message.title, { description: message.description });
+  };
+
+  const handleDelete = (id: string) => {
+    startTransition(async () => {
+      const { success, message } = await deleteKeyword(id);
+      if (!success) {
+        toast.error(message.title, { description: message.description });
+        return;
+      }
+      toast.success(message.title, { description: message.description });
+    });
   };
 
   return (
@@ -100,28 +114,37 @@ export const ManageKeywordsSheet = ({
 
         <div className="space-y-3">
           <Label>Palavras-chave Cadastradas</Label>
-          <div className="max-h-[400px] space-y-2 overflow-y-auto">
-            {keywords.map((keyword) => (
-              <div
-                key={keyword.id}
-                className="border-border bg-card flex items-center justify-between rounded-lg border p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <span>{keyword.word}</span>
-                  {keyword.campaigns.some((c) => c.isActive) && (
-                    <Badge>Em uso</Badge>
-                  )}
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-destructive h-8 w-8"
+          {keywords.length === 0 ? (
+            <div className="border-border text-muted-foreground bg-card flex flex-col items-center justify-center gap-2 rounded-lg border p-6 text-sm">
+              <MessageSquare className="h-5 w-5" />
+              <span>Nenhuma palavra-chave cadastrada.</span>
+            </div>
+          ) : (
+            <div className="max-h-[400px] space-y-2 overflow-y-auto">
+              {keywords.map((keyword) => (
+                <div
+                  key={keyword.id}
+                  className="border-border bg-card flex items-center justify-between rounded-lg border p-4"
                 >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
+                  <div className="flex items-center gap-3">
+                    <span>{keyword.word}</span>
+                    {keyword.campaigns.some((c) => c.isActive) && (
+                      <Badge>Em uso</Badge>
+                    )}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive h-8 w-8"
+                    onClick={() => handleDelete(keyword.id)}
+                    disabled={isPending}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </SheetContent>
     </Sheet>

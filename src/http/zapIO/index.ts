@@ -32,27 +32,6 @@ const sendMessage = async ({
   }
 };
 
-const getQrCode = async ({
-  sessionId,
-}: {
-  sessionId: string;
-}): Promise<ZapIOResponse<{ qr: string }>> => {
-  try {
-    const response = await axiosConfig.get<{ qr: string }>("/qr", {
-      headers: { Authorization: sessionId },
-    });
-
-    return {
-      success: true,
-      data: response.data,
-      message: "QR Code obtido com sucesso!",
-    };
-  } catch (err) {
-    console.error("Erro ao buscar QR Code:", err);
-    return { success: false, data: null, message: "Erro ao buscar QR Code" };
-  }
-};
-
 const connectSession = async (): Promise<
   ZapIOResponse<{ sessionId: string }>
 > => {
@@ -134,7 +113,7 @@ const logout = async ({
 
 export const zapIO = {
   sendMessage,
-  getQrCode,
+
   connectSession,
   configWebhook,
   logout,

@@ -4,7 +4,6 @@ import { formatDate, timeAgo } from "@/utils/date";
 
 import { getWhatsAppSession } from "../actions/get-whatsapp-session";
 import { MutationConnectionButton } from "./mutation-connection-button";
-import { AutoRefresh } from "./auto-refresh";
 
 export const StatusSession = async () => {
   const whatsAppSession = await getWhatsAppSession();
@@ -18,7 +17,6 @@ export const StatusSession = async () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="flex h-full flex-col gap-4">
-        {/* <AutoRefresh active={!connected} intervalMs={2000} /> */}
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium">Estado:</span>
           {connected ? (

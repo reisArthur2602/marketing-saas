@@ -53,7 +53,7 @@ model Template {
 
 model Keyword {
   id        String     @id @default(uuid())
-  word      String     @unique
+  word      String
   campaigns Campaign[]
   userId    String
   user      User       @relation(fields: [userId], references: [id])

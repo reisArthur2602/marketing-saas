@@ -62,6 +62,13 @@ export const weekDaysOptions = [
   { id: 0, label: "Domingo" },
 ];
 
+const formatTimeLocalHHmm = (dateLike: string | Date) => {
+  const d = new Date(dateLike);
+  const h = String(d.getHours()).padStart(2, "0");
+  const m = String(d.getMinutes()).padStart(2, "0");
+  return `${h}:${m}`;
+};
+
 export const UpsertCampaignDialog = ({
   campaign,
   exceptions,
@@ -76,8 +83,8 @@ export const UpsertCampaignDialog = ({
           name: campaign.name,
           templateId: campaign.templateId,
           daysOfWeek: campaign.daysOfWeek,
-          startTime: new Date(campaign.startTime).toISOString().slice(11, 16),
-          endTime: new Date(campaign.endTime).toISOString().slice(11, 16),
+          startTime: formatTimeLocalHHmm(campaign.startTime),
+          endTime: formatTimeLocalHHmm(campaign.endTime),
           keywords: campaign.keywords.map((k) => k.id),
           exceptions: campaign.exceptions.map((e) => e.id),
         }
@@ -103,12 +110,15 @@ export const UpsertCampaignDialog = ({
     return !isActive;
   });
   const handleCreateOrUpdate = async (data: CreateCampaignSchemaForm) => {
-    const { success, message } = await createCampaign(data);
+    const { success, message } = await createCampaign({
+      ...data,
+      id: campaign?.id,
+    });
     if (!success) {
       toast.error(message.title, { description: message.description });
       return;
     }
-    methods.reset();
+
     toast.success(message.title, { description: message.description });
   };
 
