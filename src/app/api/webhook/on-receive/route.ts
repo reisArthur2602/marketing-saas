@@ -1,4 +1,4 @@
-import axiosClient from "@/lib/axios";
+import {axiosConfig} from "@/lib/axios";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,7 +10,7 @@ interface SendMessageProps {
 
 const sendMessage = async ({ message, to, sessionId }: SendMessageProps) => {
   try {
-    await axiosClient.post(
+    await axiosConfig.post(
       "http://localhost:3030/session/send",
       { to, message },
       { headers: { Authorization: sessionId } },

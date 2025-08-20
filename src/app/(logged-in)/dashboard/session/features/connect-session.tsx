@@ -1,34 +1,42 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import axiosClient from "@/lib/axios";
 import { Smartphone } from "lucide-react";
 import Image from "next/image";
+import { zapIO } from "@/http/zapIO";
+import { getWhatsAppSession } from "../actions/get-whatsapp-session";
+import { AutoRefresh } from "./auto-refresh";
 
-interface ConnectSessionProps {
-  qrCode: string | null;
-  sessionId: string | null;
-}
-interface QrCodeResponse {
-  qr: string;
-}
-export const ConnectSession = async ({
-  qrCode,
-  sessionId,
-}: ConnectSessionProps) => {
-  const getQrCode = async () => {
-    try {
-      const response = await axiosClient.get<QrCodeResponse>("/qr", {
-        headers: {
-          Authorization: sessionId,
-        },
-      });
+export const ConnectSession = async () => {
+  const whatsAppSession = await getWhatsAppSession();
+  const sessionId = whatsAppSession?.sessionId || null;
 
-      return response.data.qr;
-    } catch (error) {
-      console.error("Erro ao buscar QR Code:", error);
-      return null;
-    }
-  };
-  const qrCodeImage = (qrCode && (await getQrCode())) || "";
+  if (!sessionId) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Conectar via QR Code</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <AutoRefresh active={true} intervalMs={2000} />
+          <div className="bg-accent/10 flex h-64 w-full items-center justify-center rounded-lg">
+            <div className="space-y-3 text-center">
+              <Smartphone className="text-muted-foreground mx-auto h-12 w-12" />
+              <div>
+                <h3 className="text-foreground font-medium">
+                  QR Code não disponível
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  Clique em {"Conectar WhatsApp"}para gerar o QR Code
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const response = await zapIO.getQrCode({ sessionId });
+  const qrCode = response.success ? response.data.qr : null;
 
   return (
     <Card>
@@ -36,17 +44,17 @@ export const ConnectSession = async ({
         <CardTitle>Conectar via QR Code</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <AutoRefresh active={!whatsAppSession?.connected} intervalMs={2000} />
         {qrCode ? (
           <>
             <Image
-              src={qrCodeImage}
+              src={qrCode}
               alt="conectar qr-code"
-              width={220}
-              height={220}
+              width={210}
+              height={210}
               priority
               className="mx-auto"
             />
-
             <div className="space-y-2 text-center">
               <h3 className="font-medium">Escaneie o QR Code</h3>
               <ol className="text-muted-foreground space-y-1 text-left text-sm">
@@ -66,9 +74,7 @@ export const ConnectSession = async ({
                   QR Code não disponível
                 </h3>
                 <p className="text-muted-foreground text-sm">
-                  {!qrCode
-                    ? "WhatsApp já está conectado"
-                    : 'Clique em "Conectar WhatsApp" para gerar o QR Code'}
+                  WhatsApp já está conectado
                 </p>
               </div>
             </div>
