@@ -27,7 +27,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-import { Tags, Trash2 } from "lucide-react";
+import { Calendar, Tags, Trash2 } from "lucide-react";
 import {
   createExceptionSchema,
   CreateExceptionSchemaForm,
@@ -53,8 +53,6 @@ export const ManageExceptionsSheet = ({
   });
 
   const handleCreateExceptions = async (data: CreateExceptionSchemaForm) => {
-    
-
     const { success, message } = await createException(data);
     if (!success) {
       toast.error(message.title, { description: message.description });
@@ -70,7 +68,7 @@ export const ManageExceptionsSheet = ({
       <SheetContent className="p-6">
         <SheetHeader className="p-0">
           <SheetTitle className="flex items-center gap-2 text-xl">
-            <Tags className="h-5 w-5" />
+            <Calendar className="h-5 w-5" />
             Gerenciar Datas de Exceção
           </SheetTitle>
           <SheetDescription />
@@ -126,7 +124,7 @@ export const ManageExceptionsSheet = ({
           </form>
         </Form>
 
-        <div className="mt-6 space-y-3">
+        <div className="space-y-3">
           <Label>Datas de Exceção Cadastradas</Label>
           <div className="max-h-[400px] space-y-2 overflow-y-auto">
             {exceptions.map((exception) => (

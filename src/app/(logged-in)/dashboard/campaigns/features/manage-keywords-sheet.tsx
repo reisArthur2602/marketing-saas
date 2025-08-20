@@ -65,8 +65,8 @@ export const ManageKeywordsSheet = ({
   return (
     <Sheet>
       <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent className="p-6">
-        <SheetHeader className="p-0">
+      <SheetContent>
+        <SheetHeader>
           <SheetTitle className="flex items-center gap-2 text-xl">
             <Tags className="h-5 w-5" />
             Gerenciar Palavras-chave
@@ -107,11 +107,9 @@ export const ManageKeywordsSheet = ({
                 className="border-border bg-card flex items-center justify-between rounded-lg border p-4"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-xs">{keyword.word}</span>
+                  <span>{keyword.word}</span>
                   {keyword.campaigns.some((c) => c.isActive) && (
-                    <Badge variant="default" className="text-xs">
-                      Em uso
-                    </Badge>
+                    <Badge>Em uso</Badge>
                   )}
                 </div>
                 <Button
