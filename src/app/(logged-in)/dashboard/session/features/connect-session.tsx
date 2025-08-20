@@ -1,13 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Smartphone } from "lucide-react";
 import Image from "next/image";
-import { zapIO } from "@/http/zapIO";
+
 import { getWhatsAppSession } from "../actions/get-whatsapp-session";
 import { AutoRefresh } from "./auto-refresh";
+import generateQrCode from "qrcode";
 
 export const ConnectSession = async () => {
   const whatsAppSession = await getWhatsAppSession();
   const sessionId = whatsAppSession?.sessionId || null;
+  const qrCode = whatsAppSession?.qrCode;
 
   if (!sessionId) {
     return (
@@ -35,8 +37,8 @@ export const ConnectSession = async () => {
     );
   }
 
-  const response = await zapIO.getQrCode({ sessionId });
-  const qrCode = response.success ? response.data.qr : null;
+  const qrCodeImage = (qrCode &&
+    (await generateQrCode.toDataURL(qrCode))) as string;
 
   return (
     <Card>
@@ -48,7 +50,7 @@ export const ConnectSession = async () => {
         {qrCode ? (
           <>
             <Image
-              src={qrCode}
+              src={qrCodeImage}
               alt="conectar qr-code"
               width={210}
               height={210}
