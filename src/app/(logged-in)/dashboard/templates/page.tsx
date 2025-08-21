@@ -5,7 +5,6 @@ import {
   Settings,
 } from "lucide-react";
 
-import React from "react";
 import { UpsertTemplateDialog } from "./features/upsert-template-dialog";
 import { getTemplates } from "./actions/get-templates";
 
@@ -15,6 +14,11 @@ import { Empty } from "@/components/shared/empty";
 import { currentUser } from "@/lib/auth-js";
 
 import { UpdateDefaultTemplateDialog } from "./features/update-default-template-dialog";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Template | Sender.io",
+};
 
 const TemplatesPage = async () => {
   const templates = await getTemplates();

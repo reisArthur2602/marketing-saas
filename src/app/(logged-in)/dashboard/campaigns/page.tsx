@@ -12,6 +12,11 @@ import { getCampaigns } from "./actions/get-campaigns";
 
 import { CampaignsList } from "./features/campaigns-list";
 import { Empty } from "@/components/shared/empty";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Campanhas | Sender.io",
+};
 
 const CampaignsPage = async () => {
   const keywords = await getKeywords();
