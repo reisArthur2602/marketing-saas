@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { PropsWithChildren } from "react";
 import { AvatarUser } from "./(main)/features/avatar-user";
 import { Navigation } from "./(main)/features/navigation";
+import { WelcomeModal } from "@/components/shared/welcome-modal";
 
 const DashboardLayout = async ({ children }: PropsWithChildren) => {
   const user = await currentUser();
@@ -12,14 +13,14 @@ const DashboardLayout = async ({ children }: PropsWithChildren) => {
   return (
     <div className="container mx-auto flex flex-1 flex-col">
       <header className="container mx-auto px-4 pt-10">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <Logo />
           <AvatarUser user={user} />
         </div>
 
         <Navigation />
       </header>
-
+      <WelcomeModal />
       <main className="flex-1 px-4 py-10">{children}</main>
     </div>
   );

@@ -38,8 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-Br">  
-    
+    <html lang="pt-br">  
       <body className={`${inter.className} dark`}>
       <Toaster theme="dark" expand  richColors/>
         {children}
