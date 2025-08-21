@@ -12,10 +12,11 @@ const DashboardLayout = async ({ children }: PropsWithChildren) => {
   return (
     <div className="container mx-auto flex flex-1 flex-col">
       <header className="container mx-auto px-4 pt-10">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <Logo />
           <AvatarUser user={user} />
         </div>
+
         <Navigation />
       </header>
 

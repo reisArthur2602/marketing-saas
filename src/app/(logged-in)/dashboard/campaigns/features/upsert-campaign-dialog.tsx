@@ -39,7 +39,7 @@ import { MultiSelect } from "./multi-select";
 import { ReturnAsyncType } from "@/utils/return-async-type";
 import { getKeywords } from "../actions/get-keywords";
 import { toast } from "sonner";
-import { createCampaign } from "../actions/create-campaign";
+import { upsertCampaign } from "../actions/upsert-campaign";
 
 interface UpsertCampaignDialogProps {
   campaign?: Campaign & {
@@ -100,6 +100,7 @@ export const UpsertCampaignDialog = ({
   });
 
   const isLoading = methods.formState.isSubmitting;
+
   const keywordOptions = keywords.filter((k) => {
     const isActive = k.campaigns.some((c) => c.isActive);
 
@@ -109,11 +110,13 @@ export const UpsertCampaignDialog = ({
 
     return !isActive;
   });
-  const handleCreateOrUpdate = async (data: CreateCampaignSchemaForm) => {
-    const { success, message } = await createCampaign({
+
+  const handleUpsertCampaign = async (data: CreateCampaignSchemaForm) => {
+    const { success, message } = await upsertCampaign({
       ...data,
       id: campaign?.id,
     });
+
     if (!success) {
       toast.error(message.title, { description: message.description });
       return;
@@ -133,7 +136,7 @@ export const UpsertCampaignDialog = ({
         </DialogHeader>
         <Form {...methods}>
           <form
-            onSubmit={methods.handleSubmit(handleCreateOrUpdate)}
+            onSubmit={methods.handleSubmit(handleUpsertCampaign)}
             className="space-y-4"
           >
             {/* Nome */}
@@ -301,25 +304,19 @@ export const UpsertCampaignDialog = ({
             />
 
             {/* Ações */}
-            <div className="flex justify-end space-x-3 pt-4">
-              <DialogClose asChild>
-                <Button type="button" variant="outline" disabled={isLoading}>
-                  Cancelar
-                </Button>
-              </DialogClose>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {campaign ? "Salvando..." : "Criando..."}
-                  </>
-                ) : campaign ? (
-                  "Salvar alterações"
-                ) : (
-                  "Criar Campanha"
-                )}
-              </Button>
-            </div>
+
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {campaign ? "Salvando..." : "Criando..."}
+                </>
+              ) : campaign ? (
+                "Salvar alterações"
+              ) : (
+                "Criar Campanha"
+              )}
+            </Button>
           </form>
         </Form>
       </DialogContent>

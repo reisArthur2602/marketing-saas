@@ -1,128 +1,73 @@
-import {axiosConfig} from "@/lib/axios";
+import { zapIO } from "@/http/zapIO";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-
-interface SendMessageProps {
-  message: string;
-  to: string;
-  sessionId: string;
-}
-
-const sendMessage = async ({ message, to, sessionId }: SendMessageProps) => {
-  try {
-    await axiosConfig.post(
-      "http://localhost:3030/session/send",
-      { to, message },
-      { headers: { Authorization: sessionId } },
-    );
-  } catch (err) {
-    console.error("Erro ao enviar mensagem:", err);
-  }
-};
 
 export const POST = async (request: NextRequest) => {
   try {
     const body = await request.json();
-    const { text, sessionId, phone } = body; // 'from' = número do usuário
+    const { text, sessionId, phone } = body;
 
     if (!text || !sessionId || !phone) {
-      return NextResponse.json({ success: true });
+      return NextResponse.json({ success: true, data: null, message: null });
     }
 
-    // Buscar sessão do WhatsApp para pegar o userId
     const session = await prisma.whatsAppSession.findUnique({
       where: { sessionId },
       select: { userId: true },
     });
 
-    if (!session) return NextResponse.json({ success: true });
+    if (!session)
+      return NextResponse.json({ success: true, data: null, message: null });
 
-    const { userId } = session;
-
-    // Buscar keywords do usuário
-    const keywords = await prisma.keyword.findMany({
-      where: { userId },
-      include: { campaigns: { include: { template: true, exceptions: true } } },
+    const campaigns = await prisma.campaign.findMany({
+      where: { userId: session.userId, isActive: true },
+      include: { template: true, exceptions: true, keywords: true },
     });
 
-    const messageText = text.message.toLowerCase();
+    const now = new Date();
+    const today = now.getDay();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
 
-    // Procurar keyword que apareça na mensagem
-    const keywordFound = keywords.find((k) =>
+    const genericMessage = `Olá! 👋 Agradecemos pelo seu contato. No momento estamos fora do nosso horário de atendimento.`;
+
+    const activeCampaign = campaigns.find((c) => {
+      const startTime = c.startTime.getHours() * 60 + c.startTime.getMinutes();
+      const endTime = c.endTime.getHours() * 60 + c.endTime.getMinutes();
+
+      const isDayValid = c.daysOfWeek.includes(today);
+      const isTimeValid = currentTime >= startTime && currentTime <= endTime;
+      const hasException = c.exceptions.some((ex) => {
+        const exDate = new Date(ex.date);
+        return (
+          exDate.getFullYear() === now.getFullYear() &&
+          exDate.getMonth() === now.getMonth() &&
+          exDate.getDate() === now.getDate()
+        );
+      });
+
+      return isDayValid && isTimeValid && !hasException;
+    });
+
+    if (!activeCampaign) {
+      await zapIO.sendMessage({
+        message: genericMessage,
+        to: phone,
+        sessionId,
+      });
+      return NextResponse.json({ success: true });
+    }
+
+    const messageText = text.message.toLowerCase();
+    const keywordFound = activeCampaign.keywords.find((k) =>
       messageText.includes(k.word.toLowerCase()),
     );
 
     if (!keywordFound) {
-      await sendMessage({
-        message: "Nenhuma palavra-chave encontrada na sua mensagem.",
-        to: phone,
-        sessionId,
-      });
       return NextResponse.json({ success: true });
     }
 
-    // Buscar primeira campanha ativa da keyword
-    const campaign = keywordFound.campaigns.find((c) => c.isActive);
-    if (!campaign) {
-      await sendMessage({
-        message: "A campanha associada a essa palavra-chave não está ativa.",
-        to: phone,
-        sessionId,
-      });
-      return NextResponse.json({ success: true });
-    }
-
-    const now = new Date();
-    const today = now.getDay();
-
-    // Validar dias da semana
-    if (!campaign.daysOfWeek.includes(today)) {
-      await sendMessage({
-        message: "A campanha não está disponível hoje.",
-        to: phone,
-        sessionId,
-      });
-      return NextResponse.json({ success: true });
-    }
-
-    // Validar horário
-    const currentTime = now.getHours() * 60 + now.getMinutes();
-    const startTime =
-      campaign.startTime.getHours() * 60 + campaign.startTime.getMinutes();
-    const endTime =
-      campaign.endTime.getHours() * 60 + campaign.endTime.getMinutes();
-
-    if (currentTime < startTime || currentTime > endTime) {
-      await sendMessage({
-        message: "A campanha não está ativa neste horário.",
-        to: phone,
-        sessionId,
-      });
-      return NextResponse.json({ success: true });
-    }
-
-    // Validar exceções
-    const hasException = campaign.exceptions.some((ex) => {
-      const exDate = new Date(ex.date);
-      return (
-        exDate.getFullYear() === now.getFullYear() &&
-        exDate.getMonth() === now.getMonth() &&
-        exDate.getDate() === now.getDate()
-      );
-    });
-
-    if (hasException) {
-      await sendMessage({
-        message: "Hoje é um dia de exceção, a campanha não está ativa.",
-        to: phone,
-        sessionId,
-      });
-      return NextResponse.json({ success: true });
-    }
-
-    // Enviar mensagem do template
-    await sendMessage({
-      message: campaign.template.text,
+    await zapIO.sendMessage({
+      message: activeCampaign.template.text,
       to: phone,
       sessionId,
     });
@@ -130,6 +75,6 @@ export const POST = async (request: NextRequest) => {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: false, data: null, message: null });
   }
 };

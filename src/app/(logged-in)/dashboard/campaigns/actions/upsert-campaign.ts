@@ -4,7 +4,7 @@ import { currentUser } from "@/lib/auth-js";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-interface CreateCampaignProps {
+interface UpsertCampaignProps {
   id?: string;
   name: string;
   templateId: string;
@@ -15,7 +15,7 @@ interface CreateCampaignProps {
   exceptions?: string[];
 }
 
-export const createCampaign = async (data: CreateCampaignProps) => {
+export const upsertCampaign = async (data: UpsertCampaignProps) => {
   if (!data.keywords || data.keywords.length === 0) {
     return {
       success: false,
@@ -54,17 +54,12 @@ export const createCampaign = async (data: CreateCampaignProps) => {
       exceptions: { set: (data?.exceptions || []).map((id) => ({ id })) },
     } as const;
 
-    const campaign = data.id
-      ? await prisma.campaign.upsert({
-          where: { id: data.id },
-          update: updatePayload,
-          create: createPayload,
-          include: { keywords: true, exceptions: true, template: true },
-        })
-      : await prisma.campaign.create({
-          data: createPayload,
-          include: { keywords: true, exceptions: true, template: true },
-        });
+    const campaign = await prisma.campaign.upsert({
+      where: { id: data.id || "" },
+      update: updatePayload,
+      create: createPayload,
+      include: { keywords: true, exceptions: true, template: true },
+    });
 
     revalidatePath("/dashboard/campaigns");
 
