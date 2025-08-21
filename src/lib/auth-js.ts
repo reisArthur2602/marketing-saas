@@ -8,6 +8,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET!,
   adapter: PrismaAdapter(prisma),
   providers: [Google],
+
+  callbacks: {
+    async session({ session, user }) {
+      session.user.id = user.id;
+      session.user.defaultFallbackMessage = user.defaultFallbackMessage;
+      return session;
+    },
+  },
 });
 
 export const currentUser = cache(async (): Promise<User | null> => {

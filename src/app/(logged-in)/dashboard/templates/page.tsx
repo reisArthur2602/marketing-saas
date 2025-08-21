@@ -1,11 +1,8 @@
 import { Button } from "@/components/ui/button";
 import {
-  Edit,
-  Eye,
   MessageCircleMore,
   MessageCircleMoreIcon,
-  MessageSquare,
-  Trash2,
+  Settings,
 } from "lucide-react";
 
 import React from "react";
@@ -15,8 +12,14 @@ import { getTemplates } from "./actions/get-templates";
 import { TemplatesList } from "./features/templates-list";
 import { Empty } from "@/components/shared/empty";
 
+import { currentUser } from "@/lib/auth-js";
+
+import { UpdateDefaultTemplateDialog } from "./features/update-default-template-dialog";
+
 const TemplatesPage = async () => {
   const templates = await getTemplates();
+  const user = await currentUser();
+  const defaultTemplate = user?.defaultFallbackMessage || "";
 
   return (
     <div className="flex-1 space-y-6">
@@ -25,12 +28,23 @@ const TemplatesPage = async () => {
           <h1>Templates</h1>
           <p>Gerencie suas respostas automáticas</p>
         </div>
-        <UpsertTemplateDialog>
-          <Button>
-            <MessageCircleMoreIcon />
-            Criar Template
-          </Button>
-        </UpsertTemplateDialog>
+        <div className="space-x-4">
+          <UpdateDefaultTemplateDialog
+            text={defaultTemplate}
+            userId={user?.id as string}
+          >
+            <Button variant="outline">
+              <Settings />
+              Configurar Template Padrão
+            </Button>
+          </UpdateDefaultTemplateDialog>
+          <UpsertTemplateDialog>
+            <Button>
+              <MessageCircleMoreIcon />
+              Criar Template
+            </Button>
+          </UpsertTemplateDialog>
+        </div>
       </div>
 
       {templates.length === 0 ? (
