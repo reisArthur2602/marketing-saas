@@ -28,12 +28,12 @@ export const Navigation = () => {
 
   return (
     <nav className="border-b">
-      <div className="flex h-16 justify-between gap-4">
+      <div className="flex h-12 justify-between">
         <div className="flex gap-2">
           <div className="flex items-center md:hidden">
             <Popover>
               <PopoverTrigger asChild>
-                <Button className="group size-8" size="icon" variant='ghost'>
+                <Button className="group size-8" size="icon" variant="ghost">
                   <Menu />
                 </Button>
               </PopoverTrigger>
@@ -74,16 +74,6 @@ export const Navigation = () => {
               </NavigationMenuList>
             </NavigationMenu>
           </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Badge variant="outline" className="gap-1.5 text-emerald-600">
-            <span
-              className="bg-primary size-1.5 rounded-full"
-              aria-hidden="true"
-            />
-            Online
-          </Badge>
         </div>
       </div>
     </nav>

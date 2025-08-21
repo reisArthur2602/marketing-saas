@@ -5,6 +5,7 @@ import { PropsWithChildren } from "react";
 import { AvatarUser } from "./(main)/features/avatar-user";
 import { Navigation } from "./(main)/features/navigation";
 import { WelcomeModal } from "@/components/shared/welcome-modal";
+import { StatusSessionBadge } from "./(main)/features/status-session-badge";
 
 const DashboardLayout = async ({ children }: PropsWithChildren) => {
   const user = await currentUser();
@@ -15,7 +16,10 @@ const DashboardLayout = async ({ children }: PropsWithChildren) => {
       <header className="container mx-auto px-4 pt-10">
         <div className="mb-4 flex items-center justify-between">
           <Logo />
-          <AvatarUser user={user} />
+          <div className="flex items-center gap-4">
+            <StatusSessionBadge />
+            <AvatarUser user={user} />
+          </div>
         </div>
 
         <Navigation />

@@ -16,8 +16,9 @@ export const POST = async (request: NextRequest) => {
       select: { userId: true },
     });
 
-    if (!session)
+    if (!session) {
       return NextResponse.json({ success: true, data: null, message: null });
+    }
 
     const campaigns = await prisma.campaign.findMany({
       where: { userId: session.userId, isActive: true },
@@ -29,15 +30,20 @@ export const POST = async (request: NextRequest) => {
     const currentTime = now.getHours() * 60 + now.getMinutes();
 
     const genericMessage =
-      "Olá! No momento estamos fora do nosso horário de funcionamento.";
+      "👋 Olá! No momento estamos fora do nosso horário de funcionamento.";
 
-    const activeCampaign = campaigns.find((c) => {
-      const startTime = c.startTime.getHours() * 60 + c.startTime.getMinutes();
-      const endTime = c.endTime.getHours() * 60 + c.endTime.getMinutes();
+    let responseMessage = null;
 
-      const isDayValid = c.daysOfWeek.includes(today);
-      const isTimeValid = currentTime >= startTime && currentTime <= endTime;
-      const hasException = c.exceptions.some((ex) => {
+    for (const campaign of campaigns) {
+      const keywordFound = campaign.keywords.find((k) =>
+        text.message.toLowerCase().includes(k.word.toLowerCase()),
+      );
+
+      if (!keywordFound) continue;
+
+      const isDayValid = campaign.daysOfWeek.includes(today);
+
+      const hasException = campaign.exceptions.some((ex) => {
         const exDate = new Date(ex.date);
         return (
           exDate.getFullYear() === now.getFullYear() &&
@@ -46,35 +52,31 @@ export const POST = async (request: NextRequest) => {
         );
       });
 
-      return isDayValid && isTimeValid && !hasException;
-    });
+      const startTime =
+        campaign.startTime.getHours() * 60 + campaign.startTime.getMinutes();
+      const endTime =
+        campaign.endTime.getHours() * 60 + campaign.endTime.getMinutes();
+      const isTimeValid = currentTime >= startTime && currentTime <= endTime;
 
-    if (!activeCampaign) {
+      if (!isDayValid || hasException) {
+        responseMessage =
+          "👋 Hoje não estamos atendendo. Por favor, tente em outro dia.";
+      } else if (!isTimeValid) {
+        responseMessage = genericMessage;
+      } else {
+        responseMessage = campaign.template.text;
+      }
+
       await zapIO.sendMessage({
-        message: genericMessage,
+        message: responseMessage,
         to: phone,
         sessionId,
       });
-      return NextResponse.json({ success: true });
+
+      return NextResponse.json({ success: true, message: responseMessage });
     }
 
-    const messageText = text.message.toLowerCase();
-    const keywordFound = activeCampaign.keywords.find((k) =>
-      messageText.includes(k.word.toLowerCase()),
-    );
-
-    if (!keywordFound) {
-      return NextResponse.json({ success: true });
-    }
-
-    // Enviar template associado
-    await zapIO.sendMessage({
-      message: activeCampaign.template.text,
-      to: phone,
-      sessionId,
-    });
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, message: responseMessage });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ success: false, data: null, message: null });
