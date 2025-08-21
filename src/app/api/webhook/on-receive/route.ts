@@ -28,7 +28,8 @@ export const POST = async (request: NextRequest) => {
     const today = now.getDay();
     const currentTime = now.getHours() * 60 + now.getMinutes();
 
-    const genericMessage = `Olá! 👋 Agradecemos pelo seu contato. No momento estamos fora do nosso horário de atendimento.`;
+    const genericMessage =
+      "Olá! No momento estamos fora do nosso horário de funcionamento.";
 
     const activeCampaign = campaigns.find((c) => {
       const startTime = c.startTime.getHours() * 60 + c.startTime.getMinutes();
@@ -66,6 +67,7 @@ export const POST = async (request: NextRequest) => {
       return NextResponse.json({ success: true });
     }
 
+    // Enviar template associado
     await zapIO.sendMessage({
       message: activeCampaign.template.text,
       to: phone,

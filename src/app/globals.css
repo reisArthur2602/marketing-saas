@@ -173,13 +173,10 @@
   }
 
   body {
-    @apply bg-background text-foreground flex;
+    @apply bg-background text-foreground flex min-h-screen ;
   }
 
-  body,
-  html {
-    @apply h-full;
-  }
+ 
 
   a {
     @apply hover:cursor-pointer;
