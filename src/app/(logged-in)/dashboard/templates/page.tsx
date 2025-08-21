@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import {
   Edit,
   Eye,
+  MessageCircleMore,
   MessageCircleMoreIcon,
   MessageSquare,
   Trash2,
@@ -11,7 +12,8 @@ import React from "react";
 import { UpsertTemplateDialog } from "./features/upsert-template-dialog";
 import { getTemplates } from "./actions/get-templates";
 
-import { TemplateCard } from "./features/template-card";
+import { TemplatesList } from "./features/templates-list";
+import { Empty } from "@/components/shared/empty";
 
 const TemplatesPage = async () => {
   const templates = await getTemplates();
@@ -31,11 +33,15 @@ const TemplatesPage = async () => {
         </UpsertTemplateDialog>
       </div>
 
-      <section className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {templates.map((template) => (
-          <TemplateCard template={template} key={template.id} />
-        ))}
-      </section>
+      {templates.length === 0 ? (
+        <Empty
+          icon={MessageCircleMore}
+          title="Nenhum template criado"
+          description="Crie seu primeiro template para começar a enviar mensagens personalizadas e automatizar sua comunicação."
+        />
+      ) : (
+        <TemplatesList templates={templates} />
+      )}
     </div>
   );
 };

@@ -79,10 +79,9 @@ export const ManageExceptionsSheet = ({
   return (
     <Sheet>
       <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent className="p-6">
-        <SheetHeader className="p-0">
-          <SheetTitle className="flex items-center gap-2 text-xl">
-            <Calendar className="h-5 w-5" />
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle className="text-base">
             Gerenciar Datas de Exceção
           </SheetTitle>
           <SheetDescription />
@@ -107,7 +106,10 @@ export const ManageExceptionsSheet = ({
                           ? field.value.toISOString().split("T")[0]
                           : ""
                       }
-                      onChange={(e) => field.onChange(new Date(e.target.value))}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        field.onChange(value ? new Date(value) : null);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -138,44 +140,41 @@ export const ManageExceptionsSheet = ({
           </form>
         </Form>
 
-        <div className="space-y-3">
-          <Label>Datas de Exceção Cadastradas</Label>
-          {exceptions.length === 0 ? (
-            <div className="border-border text-muted-foreground bg-card flex flex-col items-center justify-center gap-2 rounded-lg border p-6 text-sm">
-              <MessageSquare className="h-5 w-5" />
-              <span>Nenhuma data de exceção cadastrada.</span>
-            </div>
-          ) : (
-            <div className="max-h-[400px] space-y-2 overflow-y-auto">
-              {exceptions.map((exception) => (
-                <div
-                  key={exception.id}
-                  className="border-border bg-card flex items-center justify-between rounded-lg border p-4"
-                >
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-medium">
-                      {new Date(exception.date).toLocaleDateString("pt-BR")}
-                    </span>
-                    {exception.description && (
-                      <span className="text-muted-foreground text-xs">
-                        {exception.description}
-                      </span>
-                    )}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-destructive h-8 w-8"
-                    onClick={() => handleDelete(exception.id)}
-                    disabled={isPending}
+        {exceptions.length > 0 && (
+          <>
+            <div className="space-y-3">
+              <Label>Datas de Exceção Cadastradas</Label>
+              <div className="max-h-[400px] space-y-2 overflow-y-auto">
+                {exceptions.map((exception) => (
+                  <div
+                    key={exception.id}
+                    className="border-border bg-card flex items-center justify-between rounded-lg border p-4"
                   >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+                    <div className="flex flex-col gap-1">
+                      <span className="text-sm font-medium">
+                        {new Date(exception.date).toLocaleDateString("pt-BR")}
+                      </span>
+                      {exception.description && (
+                        <span className="text-muted-foreground text-xs">
+                          {exception.description}
+                        </span>
+                      )}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive h-8 w-8"
+                      onClick={() => handleDelete(exception.id)}
+                      disabled={isPending}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </div>
-          )}
-        </div>
+          </>
+        )}
       </SheetContent>
     </Sheet>
   );

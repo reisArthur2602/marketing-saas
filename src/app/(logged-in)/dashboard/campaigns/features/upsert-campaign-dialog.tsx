@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Campaign, Exception, Template } from "@prisma/client";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   createCampaignSchema,
@@ -76,6 +76,7 @@ export const UpsertCampaignDialog = ({
   templates,
   keywords,
 }: UpsertCampaignDialogProps) => {
+  const [open, setOpen] = useState(false);
   const methods = useForm<CreateCampaignSchemaForm>({
     resolver: zodResolver(createCampaignSchema),
     defaultValues: campaign
@@ -123,10 +124,11 @@ export const UpsertCampaignDialog = ({
     }
 
     toast.success(message.title, { description: message.description });
+    setOpen(false);
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>

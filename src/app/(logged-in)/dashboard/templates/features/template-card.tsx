@@ -4,6 +4,7 @@ import { Template } from "@prisma/client";
 import { Edit, Eye, MessageSquare, Trash2 } from "lucide-react";
 import { UpsertTemplateDialog } from "./upsert-template-dialog";
 import { PreviewTemplateDialog } from "./preview-template-dialog";
+import { DeleteTemplateAlert } from "./delete-template-alert";
 
 interface TemplateCardProps {
   template: Template;
@@ -21,9 +22,11 @@ export const TemplateCard = ({ template }: TemplateCardProps) => {
               <Edit className="h-4 w-4" />
             </Button>
           </UpsertTemplateDialog>
-          <Button variant="ghost" size="icon">
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <DeleteTemplateAlert templateId={template.id}>
+            <Button variant="ghost" size="icon">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </DeleteTemplateAlert>
         </div>
       </CardHeader>
 

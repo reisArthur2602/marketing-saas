@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CalendarX, Send, Settings } from "lucide-react";
+import { CalendarX, Send, SendIcon, Settings } from "lucide-react";
 
 import { ManageKeywordsSheet } from "./features/manage-keywords-sheet";
 import { getKeywords } from "./actions/get-keywords";
@@ -11,6 +11,7 @@ import { getTemplates } from "../templates/actions/get-templates";
 import { getCampaigns } from "./actions/get-campaigns";
 
 import { CampaignsList } from "./features/campaigns-list";
+import { Empty } from "@/components/shared/empty";
 
 const CampaignsPage = async () => {
   const keywords = await getKeywords();
@@ -52,12 +53,20 @@ const CampaignsPage = async () => {
         </div>
       </div>
 
-      <CampaignsList
-        templates={templates}
-        keywords={keywords}
-        exceptions={exceptions}
-        campaigns={campaigns}
-      />
+      {campaigns.length === 0 ? (
+        <Empty
+          icon={SendIcon}
+          title="Nenhuma campanha encontrada"
+          description="Inicie criando uma campanha para alcançar seus clientes de forma eficiente e organizada."
+        />
+      ) : (
+        <CampaignsList
+          templates={templates}
+          keywords={keywords}
+          exceptions={exceptions}
+          campaigns={campaigns}
+        />
+      )}
     </div>
   );
 };

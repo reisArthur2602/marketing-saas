@@ -14,9 +14,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Menu } from "lucide-react";
 
 const navigationLinks = [
-  { href: "/dashboard", label: "Início" },
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/dashboard/campaigns", label: "Campanhas" },
   { href: "/dashboard/templates", label: "Templates" },
   { href: "/dashboard/session", label: "Sessão" },
@@ -32,8 +33,8 @@ export const Navigation = () => {
           <div className="flex items-center md:hidden">
             <Popover>
               <PopoverTrigger asChild>
-                <Button className="group size-8" variant="ghost" size="icon">
-                  {/* ícone do menu */}
+                <Button className="group size-8" size="icon" variant='ghost'>
+                  <Menu />
                 </Button>
               </PopoverTrigger>
               <PopoverContent align="start" className="w-36 p-1 md:hidden">

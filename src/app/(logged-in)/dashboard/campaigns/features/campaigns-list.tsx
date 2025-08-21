@@ -3,13 +3,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Edit, Clock, MessageSquare } from "lucide-react";
+import { Edit, Clock, MessageSquare, Trash2 } from "lucide-react";
 
 import { getWeekDayLabel } from "@/utils/week-days";
 import { UpsertCampaignDialog } from "./upsert-campaign-dialog";
 import { ToggleCampaignButton } from "./toggle-campaign-button";
-import { DeleteCampaignButton } from "./delete-campaign-button";
 import { Exception, Prisma, Template } from "@prisma/client";
+import { DeleteCampaignAlert } from "./delete-campaign-alert";
 
 const formatLocalHHmm = (dateLike: string | Date) => {
   const d = new Date(dateLike);
@@ -51,9 +51,7 @@ export const CampaignsList = ({
                 <CardTitle className="text-lg font-semibold">
                   {campaign.name}
                 </CardTitle>
-                <Badge >
-                  {campaign.isActive ? "Ativo" : "Pausado"}
-                </Badge>
+                <Badge>{campaign.isActive ? "Ativo" : "Pausado"}</Badge>
               </div>
               <div className="flex space-x-1">
                 <UpsertCampaignDialog
@@ -70,7 +68,16 @@ export const CampaignsList = ({
                   campaignId={campaign.id}
                   isActive={campaign.isActive}
                 />
-                <DeleteCampaignButton campaignId={campaign.id} />
+
+                <DeleteCampaignAlert campaignId={campaign.id}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive h-8 w-8"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </DeleteCampaignAlert>
               </div>
             </div>
           </CardHeader>

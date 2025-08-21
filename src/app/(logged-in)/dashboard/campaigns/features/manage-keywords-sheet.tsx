@@ -80,11 +80,8 @@ export const ManageKeywordsSheet = ({
     <Sheet>
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent>
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2 text-xl">
-            <Tags className="h-5 w-5" />
-            Gerenciar Palavras-chave
-          </SheetTitle>
+        <SheetHeader className="text-base">
+          <SheetTitle className="text-base">Gerenciar Palavras-chave</SheetTitle>
           <SheetDescription />
         </SheetHeader>
 
@@ -111,41 +108,44 @@ export const ManageKeywordsSheet = ({
             </Button>
           </form>
         </Form>
-
-        <div className="space-y-3">
-          <Label>Palavras-chave Cadastradas</Label>
-          {keywords.length === 0 ? (
-            <div className="border-border text-muted-foreground bg-card flex flex-col items-center justify-center gap-2 rounded-lg border p-6 text-sm">
-              <MessageSquare className="h-5 w-5" />
-              <span>Nenhuma palavra-chave cadastrada.</span>
-            </div>
-          ) : (
-            <div className="max-h-[400px] space-y-2 overflow-y-auto">
-              {keywords.map((keyword) => (
-                <div
-                  key={keyword.id}
-                  className="border-border bg-card flex items-center justify-between rounded-lg border p-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <span>{keyword.word}</span>
-                    {keyword.campaigns.some((c) => c.isActive) && (
-                      <Badge>Em uso</Badge>
-                    )}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-destructive h-8 w-8"
-                    onClick={() => handleDelete(keyword.id)}
-                    disabled={isPending}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+        {keywords.length > 0 && (
+          <>
+            <div className="space-y-3">
+              <Label>Palavras-chave Cadastradas</Label>
+              {keywords.length === 0 ? (
+                <div className="border-border text-muted-foreground bg-card flex flex-col items-center justify-center gap-2 rounded-lg border p-6 text-sm">
+                  <MessageSquare className="h-5 w-5" />
+                  <span>Nenhuma palavra-chave cadastrada.</span>
                 </div>
-              ))}
+              ) : (
+                <div className="max-h-[400px] space-y-2 overflow-y-auto">
+                  {keywords.map((keyword) => (
+                    <div
+                      key={keyword.id}
+                      className="border-border bg-card flex items-center justify-between rounded-lg border p-4"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span>{keyword.word}</span>
+                        {keyword.campaigns.some((c) => c.isActive) && (
+                          <Badge>Em uso</Badge>
+                        )}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive h-8 w-8"
+                        onClick={() => handleDelete(keyword.id)}
+                        disabled={isPending}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </>
+        )}
       </SheetContent>
     </Sheet>
   );
