@@ -21,6 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   trustHost:true,
   secret: process.env.AUTH_SECRET!,
+ 
 });
 
 export const currentUser = cache(async (): Promise<User | null> => {

@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 import { createWhatsAppSession } from "@/app/(logged-in)/dashboard/session/actions/create-whatsapp-session";
 import { axiosConfig } from "@/lib/axios";
 
@@ -36,7 +38,9 @@ const connectSession = async (): Promise<
   ZapIOResponse<{ sessionId: string }>
 > => {
   try {
-    const name = `sender.io-${crypto.randomUUID()}`;
+      
+
+    const name = `sender.io-${uuidv4()}`;
     const response = (
       await axiosConfig.post<{ sessionId: string }>("/", { name })
     ).data;
@@ -113,7 +117,6 @@ const logout = async ({
 
 export const zapIO = {
   sendMessage,
-
   connectSession,
   configWebhook,
   logout,
