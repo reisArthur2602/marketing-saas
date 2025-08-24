@@ -7,10 +7,13 @@ import { cache } from "react";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  providers: [Google,Nodemailer({
+  providers: [
+    Google,
+    Nodemailer({
       server: process.env.EMAIL_SERVER,
       from: process.env.EMAIL_FROM,
-    }), ],
+    }),
+  ],
 
   callbacks: {
     async session({ session, user }) {
@@ -19,9 +22,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
-  trustHost:true,
+  trustHost: true,
   secret: process.env.AUTH_SECRET!,
- 
 });
 
 export const currentUser = cache(async (): Promise<User | null> => {

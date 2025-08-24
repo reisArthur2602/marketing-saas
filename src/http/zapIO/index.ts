@@ -38,8 +38,6 @@ const connectSession = async (): Promise<
   ZapIOResponse<{ sessionId: string }>
 > => {
   try {
-      
-
     const name = `sender.io-${uuidv4()}`;
     const response = (
       await axiosConfig.post<{ sessionId: string }>("/", { name })
@@ -94,11 +92,7 @@ const logout = async ({
   sessionId: string;
 }): Promise<ZapIOResponse<void>> => {
   try {
-    await axiosConfig.patch(
-      "/disconnect",
-      {},
-      { headers: { Authorization: sessionId } },
-    );
+    await axiosConfig.delete("/", { headers: { Authorization: sessionId } });
 
     return {
       success: true,

@@ -1,11 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Loader2, QrCode, Smartphone, WifiOff } from "lucide-react";
+import { Loader2, Smartphone, X } from "lucide-react";
 import { useTransition } from "react";
 import { zapIO } from "@/http/zapIO";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { deleteWhatsAppSession } from "../actions/delete-whatsapp-session";
 
 interface MutationConnectionButtonProps {
   connected: boolean;
@@ -18,6 +19,7 @@ export const MutationConnectionButton = ({
 }: MutationConnectionButtonProps) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const isRemoving = (sessionId && !connected) || (sessionId && connected);
 
   const handleConnect = () => {
     startTransition(async () => {
@@ -40,7 +42,7 @@ export const MutationConnectionButton = ({
     });
   };
 
-  const handleDisconnect = () => {
+  const handleLogout = () => {
     startTransition(async () => {
       if (!sessionId) return;
       const logout = await zapIO.logout({ sessionId });
@@ -48,46 +50,34 @@ export const MutationConnectionButton = ({
         toast.error(logout.message);
         return;
       }
+      await deleteWhatsAppSession({ sessionId });
       toast.success(logout.message);
-      router.refresh();
     });
   };
-
-  // Disable only while pending or when a session exists but is not yet connected (waiting for QR)
-  const isDisabled = isPending || (!!sessionId && !connected);
 
   const renderButtonContent = () => {
     if (isPending) {
       return (
         <>
           <Loader2 className="h-4 w-4 animate-spin" />
-          Conectando...
+          {isRemoving ? "Removendo..." : "Conectando..."}
         </>
       );
     }
 
-    if (connected) {
+    if (!sessionId) {
       return (
         <>
-          <WifiOff className="h-4 w-4" />
-          Desconectar
-        </>
-      );
-    }
-
-    if (!!sessionId && !connected) {
-      return (
-        <>
-          <QrCode className="h-4 w-4" />
-          Aguardando QR Code
+          <Smartphone className="h-4 w-4" />
+          Conectar WhatsApp
         </>
       );
     }
 
     return (
       <>
-        <Smartphone className="h-4 w-4" />
-        Conectar WhatsApp
+        <X className="h-4 w-4" />
+        Remover Sessão
       </>
     );
   };
@@ -95,8 +85,9 @@ export const MutationConnectionButton = ({
   return (
     <Button
       className="mt-auto"
-      onClick={connected ? handleDisconnect : handleConnect}
-      disabled={isDisabled}
+      onClick={isRemoving ? handleLogout : handleConnect}
+      disabled={isPending} // desabilita enquanto carrega
+      variant={isRemoving ? "destructive" : "default"}
     >
       {renderButtonContent()}
     </Button>

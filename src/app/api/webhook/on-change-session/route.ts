@@ -3,27 +3,49 @@ import { revalidatePath } from "next/cache";
 
 import { NextRequest, NextResponse } from "next/server";
 
-type BodyResponse = {
+interface UpdateSessionProps {
+  sessionId: string;
+  connected: boolean;
+  qrCode: string | null;
+}
+
+const updateSession = async (data: UpdateSessionProps) => {
+  await prisma.whatsAppSession.update({
+    where: {
+      sessionId: data.sessionId,
+    },
+    data: {
+      connected: data.connected,
+      qrCode: data.qrCode,
+    },
+  });
+  revalidatePath("/dashboard/session");
+};
+
+interface Body {
   session: {
     id: string;
     qrCode: string | null;
     connected: boolean;
   };
-};
+}
 
 export const POST = async (request: NextRequest) => {
-  const { session } = (await request.json()) as BodyResponse;
+  try {
+    const { session } = (await request.json()) as Body;
 
-  await prisma.whatsAppSession.update({
-    where: {
-      sessionId: session?.id as string,
-    },
-    data: {
+    if (!session) return NextResponse.json({ success: false }, { status: 400 });
+
+    await updateSession({
+      sessionId: session.id,
       connected: session.connected,
       qrCode: session.qrCode,
-    },
-  });
-  revalidatePath("/dashboard/session");
+    });
 
-  return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true }, { status: 200 });
+    
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ success: false }, { status: 500 });
+  }
 };

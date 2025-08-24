@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Smartphone } from "lucide-react";
+import { Smartphone, Loader2 } from "lucide-react";
 import Image from "next/image";
 
 import { getWhatsAppSession } from "../actions/get-whatsapp-session";
@@ -11,6 +11,7 @@ export const ConnectSession = async () => {
   const sessionId = whatsAppSession?.sessionId || null;
   const qrCode = whatsAppSession?.qrCode;
 
+  // Caso não exista sessão ainda
   if (!sessionId) {
     return (
       <Card>
@@ -27,7 +28,7 @@ export const ConnectSession = async () => {
                   QR Code não disponível
                 </h3>
                 <p className="text-muted-foreground text-sm">
-                  Clique em {"Conectar WhatsApp"}para gerar o QR Code
+                  Clique em {"Conectar WhatsApp"} para gerar o QR Code
                 </p>
               </div>
             </div>
@@ -37,8 +38,35 @@ export const ConnectSession = async () => {
     );
   }
 
-  const qrCodeImage = (qrCode &&
-    (await generateQrCode.toDataURL(qrCode))) as string;
+  // Sessão existe mas QRCode ainda não foi gerado → Loading
+  if (sessionId && !qrCode) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Conectar via QR Code</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <AutoRefresh active={true} intervalMs={2000} />
+          <div className="bg-accent/10 flex h-64 w-full items-center justify-center rounded-lg">
+            <div className="space-y-3 text-center">
+              <Loader2 className="text-muted-foreground mx-auto h-10 w-10 animate-spin" />
+              <div>
+                <h3 className="text-foreground font-medium">
+                  Gerando QR Code...
+                </h3>
+                <p className="text-muted-foreground text-sm">
+                  Aguarde alguns instantes
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // QRCode pronto
+  const qrCodeImage = (await generateQrCode.toDataURL(qrCode!)) as string;
 
   return (
     <Card>
@@ -47,7 +75,8 @@ export const ConnectSession = async () => {
       </CardHeader>
       <CardContent className="space-y-4">
         <AutoRefresh active={!whatsAppSession?.connected} intervalMs={2000} />
-        {qrCode ? (
+
+        {qrCodeImage ? (
           <>
             <Image
               src={qrCodeImage}
