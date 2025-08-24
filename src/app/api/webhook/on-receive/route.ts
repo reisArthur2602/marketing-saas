@@ -1,63 +1,41 @@
 import { zapIO } from "@/http/zapIO";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { cache } from "react";
 
-const findSession = async (sessionId: string) => {
-  return await prisma.whatsAppSession.findUnique({
+const findSession = cache(async ({ sessionId }: { sessionId: string }) => {
+  return prisma.whatsAppSession.findUnique({
     where: { sessionId },
     select: {
       userId: true,
       user: { select: { defaultFallbackMessage: true } },
     },
   });
-};
+});
 
-const findCampaigns = async (userId: string) => {
-  return await prisma.campaign.findMany({
+const findCampaigns = cache(async ({ userId }: { userId: string }) => {
+  return prisma.campaign.findMany({
     where: { userId, isActive: true },
     include: { template: true, exceptions: true, keywords: true },
   });
-};
+});
 
-const isExceptionDay = (exceptions: { date: Date }[], now: Date) => {
-  return exceptions.some((ex) => {
-    const exDate = new Date(ex.date);
-    return (
-      exDate.getFullYear() === now.getFullYear() &&
-      exDate.getMonth() === now.getMonth() &&
-      exDate.getDate() === now.getDate()
-    );
+const saveMessage = async ({
+  phone,
+  userId,
+  messageId,
+  keywordId,
+  content,
+}: {
+  phone: string;
+  userId: string;
+  messageId: string;
+  keywordId: string;
+  content: string;
+}) => {
+  await prisma.messageLog.create({
+    data: { phone, userId, messageId, keywordId, content },
   });
-};
-
-const isTimeInRange = (start: Date, end: Date, now: Date) => {
-  const currentTime = now.getHours() * 60 + now.getMinutes();
-  const startTime = start.getHours() * 60 + start.getMinutes();
-  const endTime = end.getHours() * 60 + end.getMinutes();
-  return currentTime >= startTime && currentTime <= endTime;
-};
-
-const getCampaignResponse = (
-  campaign: Awaited<ReturnType<typeof findCampaigns>>[number],
-  text: string,
-  now: Date,
-): string | null => {
-  const keywordFound = campaign.keywords.find((k) =>
-    text.toLowerCase().includes(k.word.toLowerCase()),
-  );
-  if (!keywordFound) return null;
-
-  const isDayValid = campaign.daysOfWeek.includes(now.getDay());
-  const hasException = isExceptionDay(campaign.exceptions, now);
-  const isTimeValid = isTimeInRange(campaign.startTime, campaign.endTime, now);
-
-  if (!isDayValid || hasException)
-    return "👋 Hoje não estamos atendendo. Por favor, tente em outro dia.";
-
-  if (!isTimeValid)
-    return "👋 Olá! No momento estamos fora do nosso horário de funcionamento.";
-
-  return campaign.template.text;
 };
 
 interface Body {
@@ -70,37 +48,81 @@ interface Body {
 export const POST = async (request: NextRequest) => {
   try {
     const body = (await request.json()) as Body;
-    const { text, sessionId, phone } = body;
+    const { text, sessionId, phone, messageId } = body;
 
-    if (!text || !sessionId || !phone) {
-      return NextResponse.json({ success: false }, { status: 400 });
-    }
-
-    const session = await findSession(sessionId);
-    if (!session) {
-      return NextResponse.json({ success: false }, { status: 404 });
-    }
-
-    const campaigns = await findCampaigns(session.userId);
-    const now = new Date();
-
-    for (const campaign of campaigns) {
-      const responseMessage = getCampaignResponse(campaign, text.message, now);
-      if (!responseMessage) continue;
-
-      await zapIO.sendMessage({
-        message: responseMessage,
-        to: phone,
-        sessionId,
-      });
+    if (!text || !sessionId || !phone || !messageId)
       return NextResponse.json({ success: true }, { status: 200 });
+
+    const session = await findSession({ sessionId });
+
+    if (!session) return NextResponse.json({ success: false }, { status: 400 });
+
+    let responseMessage =
+      "👋 Olá! No momento estamos fora do nosso horário de atendimento. Por favor, tente novamente mais tarde.";
+
+    const campaigns = await findCampaigns({
+      userId: session.userId,
+    });
+    const hasCampaign = campaigns.length > 0;
+    const now = new Date();
+    const today = now.getDay();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+
+    if (hasCampaign) {
+      for (const campaign of campaigns) {
+        const keywordFound = campaign.keywords.find((k) =>
+          text.message.toLowerCase().includes(k.word.toLowerCase()),
+        );
+        if (!keywordFound) continue;
+
+        const isDayValid = campaign.daysOfWeek.includes(today);
+
+        const hasException = campaign.exceptions.some((ex) => {
+          const exDate = new Date(ex.date);
+          return (
+            exDate.getFullYear() === now.getFullYear() &&
+            exDate.getMonth() === now.getMonth() &&
+            exDate.getDate() === now.getDate()
+          );
+        });
+
+        const startTime =
+          campaign.startTime.getHours() * 60 + campaign.startTime.getMinutes();
+
+        const endTime =
+          campaign.endTime.getHours() * 60 + campaign.endTime.getMinutes();
+
+        const isTimeValid = currentTime >= startTime && currentTime <= endTime;
+
+        if (isDayValid && !hasException && isTimeValid)
+          responseMessage = campaign.template.text;
+
+        await zapIO.sendMessage({
+          message: responseMessage,
+          to: phone,
+          sessionId,
+        });
+
+        await saveMessage({
+          content: text.message,
+          keywordId: keywordFound.id,
+          messageId,
+          phone,
+          userId: session.userId,
+        });
+
+        return NextResponse.json({ success: true }, { status: 200 });
+      }
     }
 
     const fallbackMessage =
-      session.user.defaultFallbackMessage ||
-      "👋 Olá! No momento estamos fora do nosso horário de funcionamento.";
+      session.user.defaultFallbackMessage || responseMessage;
 
-    await zapIO.sendMessage({ message: fallbackMessage, to: phone, sessionId });
+    await zapIO.sendMessage({
+      message: fallbackMessage,
+      to: phone,
+      sessionId,
+    });
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {

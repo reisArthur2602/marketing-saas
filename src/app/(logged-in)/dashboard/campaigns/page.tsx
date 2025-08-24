@@ -2,27 +2,21 @@ import { Button } from "@/components/ui/button";
 import { CalendarX, Send, SendIcon, Settings } from "lucide-react";
 
 import { ManageKeywordsSheet } from "./features/manage-keywords-sheet";
-import { getKeywords } from "./actions/get-keywords";
 import { ManageExceptionsSheet } from "./features/manage-exceptions-sheet";
-import { getExceptions } from "./actions/get-exception";
 import { UpsertCampaignDialog } from "./features/upsert-campaign-dialog";
-import { getTemplates } from "../templates/actions/get-templates";
-
-import { getCampaigns } from "./actions/get-campaigns";
 
 import { CampaignsList } from "./features/campaigns-list";
 import { Empty } from "@/components/shared/empty";
 import { Metadata } from "next";
+import { getCampaignsData } from "./actions/get-campaigns-data";
 
 export const metadata: Metadata = {
   title: "Campanhas | Sender.io",
 };
 
 const CampaignsPage = async () => {
-  const keywords = await getKeywords();
-  const exceptions = await getExceptions();
-  const templates = await getTemplates();
-  const campaigns = await getCampaigns();
+  const { campaigns, availableKeywords, exceptions, keywords, templates } =
+    await getCampaignsData();
 
   return (
     <div className="flex-1 space-y-6">
@@ -47,7 +41,7 @@ const CampaignsPage = async () => {
           </ManageExceptionsSheet>
           <UpsertCampaignDialog
             templates={templates}
-            keywords={keywords}
+            availableKeywords={availableKeywords}
             exceptions={exceptions}
           >
             <Button>
@@ -67,7 +61,7 @@ const CampaignsPage = async () => {
       ) : (
         <CampaignsList
           templates={templates}
-          keywords={keywords}
+          availableKeywords={availableKeywords}
           exceptions={exceptions}
           campaigns={campaigns}
         />

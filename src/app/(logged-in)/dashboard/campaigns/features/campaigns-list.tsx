@@ -8,7 +8,7 @@ import { Edit, Clock, MessageSquare, Trash2 } from "lucide-react";
 import { getWeekDayLabel } from "@/utils/week-days";
 import { UpsertCampaignDialog } from "./upsert-campaign-dialog";
 import { ToggleCampaignButton } from "./toggle-campaign-button";
-import { Exception, Prisma, Template } from "@prisma/client";
+import { Exception, Keyword, Prisma, Template } from "@prisma/client";
 import { DeleteCampaignAlert } from "./delete-campaign-alert";
 
 const formatLocalHHmm = (dateLike: string | Date) => {
@@ -26,18 +26,14 @@ interface CampaignsListProps {
       template: true;
     };
   }>[];
-  keywords: Prisma.KeywordGetPayload<{
-    include: {
-      campaigns: true;
-    };
-  }>[];
+  availableKeywords: Keyword[];
   exceptions: Exception[];
   templates: Template[];
 }
 
 export const CampaignsList = ({
   campaigns,
-  keywords,
+  availableKeywords,
   exceptions,
   templates,
 }: CampaignsListProps) => {
@@ -56,7 +52,7 @@ export const CampaignsList = ({
               <div className="flex space-x-1">
                 <UpsertCampaignDialog
                   campaign={campaign}
-                  keywords={keywords}
+                  availableKeywords={availableKeywords}
                   exceptions={exceptions}
                   templates={templates}
                 >

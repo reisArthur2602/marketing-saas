@@ -1,12 +1,12 @@
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Lexend_Deca } from "next/font/google";
 
-const inter = Inter({
+const lexend_Deca = Lexend_Deca({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-inter",
+  variable: "--font-lexend-deca",
 });
 
 export const metadata: Metadata = {
@@ -37,8 +37,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-br" >
-      <body className={`${inter.className} dark`}>
+    <html lang="pt-br">
+      <body className={`${lexend_Deca.className} dark`}>
         <Toaster theme="dark" expand richColors />
         {children}
       </body>

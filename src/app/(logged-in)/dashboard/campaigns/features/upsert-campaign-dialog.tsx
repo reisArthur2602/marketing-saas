@@ -6,7 +6,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -25,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Campaign, Exception, Template } from "@prisma/client";
+import { Campaign, Exception, Keyword, Template } from "@prisma/client";
 import { ReactNode, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -36,17 +35,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { MultiSelect } from "./multi-select";
-import { ReturnAsyncType } from "@/utils/return-async-type";
-import { getKeywords } from "../actions/get-keywords";
+
 import { toast } from "sonner";
 import { upsertCampaign } from "../actions/upsert-campaign";
 
 interface UpsertCampaignDialogProps {
   campaign?: Campaign & {
-    keywords: { id: string }[];
-    exceptions: { id: string }[];
+    keywords: Keyword[];
+    exceptions: Exception[];
   };
-  keywords: ReturnAsyncType<typeof getKeywords>;
+  availableKeywords: Keyword[];
   templates: Template[] | [];
   exceptions: Exception[];
   children: ReactNode;
@@ -74,9 +72,10 @@ export const UpsertCampaignDialog = ({
   exceptions,
   children,
   templates,
-  keywords,
+  availableKeywords,
 }: UpsertCampaignDialogProps) => {
   const [open, setOpen] = useState(false);
+
   const methods = useForm<CreateCampaignSchemaForm>({
     resolver: zodResolver(createCampaignSchema),
     defaultValues: campaign
@@ -102,15 +101,12 @@ export const UpsertCampaignDialog = ({
 
   const isLoading = methods.formState.isSubmitting;
 
-  const keywordOptions = keywords.filter((k) => {
-    const isActive = k.campaigns.some((c) => c.isActive);
-
-    if (campaign?.keywords.some((kw) => kw.id === k.id)) {
-      return true;
-    }
-
-    return !isActive;
-  });
+  const keywordsOptions = [...(campaign?.keywords || []), ...availableKeywords]
+    .map((k) => ({
+      value: k.id,
+      label: k.word,
+    }))
+    .filter((v, i, a) => a.findIndex((k) => k.value === v.value) === i);
 
   const handleUpsertCampaign = async (data: CreateCampaignSchemaForm) => {
     const { success, message } = await upsertCampaign({
@@ -141,7 +137,6 @@ export const UpsertCampaignDialog = ({
             onSubmit={methods.handleSubmit(handleUpsertCampaign)}
             className="space-y-4"
           >
-            {/* Nome */}
             <FormField
               control={methods.control}
               name="name"
@@ -156,7 +151,6 @@ export const UpsertCampaignDialog = ({
               )}
             />
 
-            {/* Template */}
             <FormField
               control={methods.control}
               name="templateId"
@@ -182,7 +176,6 @@ export const UpsertCampaignDialog = ({
               )}
             />
 
-            {/* Dias da semana */}
             <FormField
               control={methods.control}
               name="daysOfWeek"
@@ -227,7 +220,6 @@ export const UpsertCampaignDialog = ({
               )}
             />
 
-            {/* Horários */}
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={methods.control}
@@ -257,7 +249,6 @@ export const UpsertCampaignDialog = ({
               />
             </div>
 
-            {/* Keywords */}
             <FormField
               control={methods.control}
               name="keywords"
@@ -266,10 +257,7 @@ export const UpsertCampaignDialog = ({
                   <FormLabel>Palavras-chave</FormLabel>
                   <FormControl>
                     <MultiSelect
-                      options={keywordOptions.map((k) => ({
-                        value: k.id,
-                        label: k.word,
-                      }))}
+                      options={keywordsOptions}
                       value={field.value}
                       onValueChange={field.onChange}
                       placeholder="Selecione palavras-chave"

@@ -2,10 +2,10 @@ import { Logo } from "@/components/shared/logo";
 import { currentUser } from "@/lib/auth-js";
 import { redirect } from "next/navigation";
 import { PropsWithChildren } from "react";
-import { AvatarUser } from "./(main)/features/avatar-user";
-import { Navigation } from "./(main)/features/navigation";
+import { StatusSessionBadge } from "./features/status-session-badge";
+import { AvatarUser } from "./features/avatar-user";
+import { Navigation } from "./features/navigation";
 import { WelcomeModal } from "@/components/shared/welcome-modal";
-import { StatusSessionBadge } from "./(main)/features/status-session-badge";
 
 const DashboardLayout = async ({ children }: PropsWithChildren) => {
   const user = await currentUser();
@@ -25,7 +25,7 @@ const DashboardLayout = async ({ children }: PropsWithChildren) => {
         <Navigation />
       </header>
       <WelcomeModal />
-      <main className="flex-1 px-4 py-10">{children}</main>
+      <main className="flex flex-1 px-4 py-10">{children}</main>
     </div>
   );
 };

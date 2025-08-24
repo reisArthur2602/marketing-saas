@@ -1,20 +1,15 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from "@/app/(logged-in)/dashboard/(main)/features/navigation-menu";
+
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Menu } from "lucide-react";
+import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "./navigation-menu";
 
 const navigationLinks = [
   { href: "/dashboard", label: "Dashboard" },

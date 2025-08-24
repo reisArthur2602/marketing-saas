@@ -4,8 +4,8 @@ export const Logo = () => {
   return (
     <Link href="/" className="flex w-fit items-center gap-2">
       <svg
-        width="26px"
-        height="26px"
+        width="24px"
+        height="24px"
         viewBox="0 0 24 24"
         fill="#00bc7d"
         xmlns="http://www.w3.org/2000/svg"
@@ -22,7 +22,7 @@ export const Logo = () => {
           </g>
         </g>
       </svg>
-      <div className="text-xl font-semibold tracking-tighter">Sender.io</div>
+      <div className="text-xl font-semibold up">Sender.io</div>
     </Link>
   );
 };

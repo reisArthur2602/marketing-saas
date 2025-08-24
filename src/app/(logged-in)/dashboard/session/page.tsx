@@ -1,6 +1,7 @@
 import { Metadata } from "next";
-import { StatusSession } from "./features/status-session";
+
 import { ConnectSession } from "./features/connect-session";
+import { StatusSession } from "./features/status-session";
 
 export const metadata: Metadata = {
   title: "Sessão | Sender.io",

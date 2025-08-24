@@ -13,7 +13,7 @@ axiosRetry(axiosConfig, {
   retries: 3,
   retryDelay: axiosRetry.exponentialDelay,
   retryCondition: (error) =>
-    error.code === "ECONNABORTED" || error.response?.status! >= 500,
+    error.code === "ECONNABORTED" || error.response?.status as number >= 500,
 });
 
 

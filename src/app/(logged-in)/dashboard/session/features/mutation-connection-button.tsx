@@ -86,8 +86,8 @@ export const MutationConnectionButton = ({
     <Button
       className="mt-auto"
       onClick={isRemoving ? handleLogout : handleConnect}
-      disabled={isPending} // desabilita enquanto carrega
-      variant={isRemoving ? "destructive" : "default"}
+      disabled={isPending} 
+     
     >
       {renderButtonContent()}
     </Button>

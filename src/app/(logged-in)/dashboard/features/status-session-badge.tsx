@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { getWhatsAppSession } from "../../session/actions/get-whatsapp-session";
+import { getWhatsAppSession } from "../session/actions/get-whatsapp-session";
 
 export const StatusSessionBadge = async () => {
   const session = await getWhatsAppSession();

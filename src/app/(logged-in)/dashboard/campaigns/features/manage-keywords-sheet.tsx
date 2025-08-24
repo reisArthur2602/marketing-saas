@@ -30,13 +30,13 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createKeyword } from "../actions/create-keyword";
 import { toast } from "sonner";
-import { getKeywords } from "../actions/get-keywords";
-import { ReturnAsyncType } from "@/utils/return-async-type";
-import { MessageSquare, Tags, Trash2 } from "lucide-react";
+
+import { MessageSquare, Trash2 } from "lucide-react";
 import { deleteKeyword } from "../actions/delete-keyword";
+import { Prisma } from "@prisma/client";
 
 interface ManageKeywordsSheetProps {
-  keywords: ReturnAsyncType<typeof getKeywords>;
+  keywords: Prisma.KeywordGetPayload<{ include: { campaigns: true } }>[];
   children: ReactNode;
 }
 
@@ -81,7 +81,9 @@ export const ManageKeywordsSheet = ({
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent>
         <SheetHeader className="text-base">
-          <SheetTitle className="text-base">Gerenciar Palavras-chave</SheetTitle>
+          <SheetTitle className="text-base">
+            Gerenciar Palavras-chave
+          </SheetTitle>
           <SheetDescription />
         </SheetHeader>
 

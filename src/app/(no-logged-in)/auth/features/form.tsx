@@ -10,7 +10,9 @@ type Provider = "google" | "nodemailer";
 export const AuthForm = () => {
   const handleLogin = async (form: FormData) => {
     "use server";
+
     const provider = form.get("provider") as Provider;
+
     switch (provider) {
       case "google":
         await signIn(provider, { redirectTo: "/dashboard" });
@@ -28,7 +30,7 @@ export const AuthForm = () => {
       <div className="flex flex-col items-center gap-2 text-center">
         <Logo />
         <div>
-          <h2 className="text-lg font-semibold">Bem-vindo de volta</h2>
+          <h1 className="text-lg font-semibold">Bem-vindo de volta</h1>
           <p className="text-muted-foreground text-sm">
             Acesse sua conta, ou crie gratuitamente
           </p>
