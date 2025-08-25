@@ -49,7 +49,7 @@ export const AuthForm = () => {
           />
         </div>
         <Button className="w-full">
-          <Mail /> Entrar com email
+          <Mail /> Enviar código
         </Button>
       </form>
 
