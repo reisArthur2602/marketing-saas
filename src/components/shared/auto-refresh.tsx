@@ -10,7 +10,7 @@ interface AutoRefreshProps {
 
 export const AutoRefresh = ({
   active,
-  intervalMs = 5000,
+  intervalMs = 2000,
 }: AutoRefreshProps) => {
   const router = useRouter();
 

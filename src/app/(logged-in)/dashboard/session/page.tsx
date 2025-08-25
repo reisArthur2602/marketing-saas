@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const SessionPage = async () => {
-  const session = await getWhatsAppSession();
+  
 
   return (
     <div className="flex-1 space-y-6">
@@ -17,7 +17,7 @@ const SessionPage = async () => {
         <p>Gerencie a conexão com o WhatsApp</p>
       </div>
 
-      <ManageSession session={session} />
+      <ManageSession  />
     </div>
   );
 };

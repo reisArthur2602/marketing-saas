@@ -1,5 +1,6 @@
 import { zapIO } from "@/http/zapIO";
 import { prisma } from "@/lib/prisma";
+import { normalizeText } from "@/utils/normalize-text";
 import { NextRequest, NextResponse } from "next/server";
 import { cache } from "react";
 
@@ -71,7 +72,7 @@ export const POST = async (request: NextRequest) => {
     if (hasCampaign) {
       for (const campaign of campaigns) {
         const keywordFound = campaign.keywords.find((k) =>
-          text.message.toLowerCase().includes(k.word.toLowerCase()),
+          normalizeText(text.message).includes(normalizeText(k.word)),
         );
         if (!keywordFound) continue;
 
@@ -115,14 +116,14 @@ export const POST = async (request: NextRequest) => {
       }
     }
 
-    const fallbackMessage =
-      session.user.defaultFallbackMessage || responseMessage;
-
-    await zapIO.sendMessage({
-      message: fallbackMessage,
-      to: phone,
-      sessionId,
-    });
+    const fallbackMessage = session.user.defaultFallbackMessage;
+    if (fallbackMessage) {
+      await zapIO.sendMessage({
+        message: fallbackMessage,
+        to: phone,
+        sessionId,
+      });
+    }
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {

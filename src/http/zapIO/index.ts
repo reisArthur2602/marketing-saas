@@ -124,9 +124,39 @@ const logout = async ({
   }
 };
 
+const refresh = async ({
+  sessionId,
+}: {
+  sessionId: string;
+}): Promise<ZapIOResponse<void>> => {
+  try {
+    const res = await fetch(`${API_BASE}/qr/refresh`, {
+      method: "PATCH",
+      headers: { Authorization: sessionId },
+      body: JSON.stringify({}),
+    });
+
+    if (!res.ok) throw new Error("Erro HTTP");
+
+    return {
+      success: true,
+      data: undefined,
+      message: "Sessão atualizada com sucesso!",
+    };
+  } catch (err) {
+    console.error("Erro ao atualizar sessão:", err);
+    return {
+      success: false,
+      data: null,
+      message: "Erro ao atualizar sessão",
+    };
+  }
+};
+
 export const zapIO = {
   sendMessage,
   connectSession,
   configWebhook,
   logout,
+  refresh,
 };
