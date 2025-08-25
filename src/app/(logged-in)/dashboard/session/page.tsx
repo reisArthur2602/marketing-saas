@@ -1,6 +1,6 @@
-import { Metadata } from "next";
+export const dynamic = "force-dynamic";
 
-import { getWhatsAppSession } from "./actions/get-whatsapp-session";
+import { Metadata } from "next";
 import { ManageSession } from "./features/manage-session";
 
 export const metadata: Metadata = {
@@ -8,8 +8,6 @@ export const metadata: Metadata = {
 };
 
 const SessionPage = async () => {
-  
-
   return (
     <div className="flex-1 space-y-6">
       <div>
@@ -17,7 +15,7 @@ const SessionPage = async () => {
         <p>Gerencie a conexão com o WhatsApp</p>
       </div>
 
-      <ManageSession  />
+      <ManageSession />
     </div>
   );
 };

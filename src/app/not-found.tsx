@@ -3,7 +3,7 @@
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { ArrowRight, FileQuestion, Home } from "lucide-react";
+import { ArrowRight, FileQuestion } from "lucide-react";
 
 import Link from "next/link";
 

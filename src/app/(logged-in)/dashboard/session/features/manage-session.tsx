@@ -1,19 +1,15 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { WhatsAppSession } from "@prisma/client";
 
 import { Button } from "@/components/ui/button";
 import {
-  Loader,
   Loader2,
   LoaderCircle,
   QrCode,
-  QrCodeIcon,
   RefreshCcw,
   Smartphone,
   WifiOffIcon,
 } from "lucide-react";
-import { ScanAnimation } from "@/components/shared/scan-animation/scan-animation";
 
 import { formatDate, timeAgo } from "@/utils/date";
 import { connectSession } from "../actions/connect-session";
@@ -92,7 +88,7 @@ export const ManageSession = async () => {
               <ol className="text-muted-foreground space-y-1 text-left text-sm">
                 <li>1. Abra o WhatsApp no seu celular</li>
                 <li>2. Vá em Menu → Dispositivos conectados</li>
-                <li>3. Toque em "Conectar um dispositivo"</li>
+                <li>3. Toque em → Conectar um dispositivo</li>
                 <li>4. Aponte o celular para esta tela</li>
               </ol>
             </div>
@@ -170,7 +166,7 @@ export const ManageSession = async () => {
                   <h3 className="font-medium">A conexão foi perdida</h3>
 
                   <ol className="text-muted-foreground space-y-1 text-left text-sm">
-                    <li>1. Clique em "Reabrir conexão" ao lado.</li>
+                    <li>1. Clique em → Reabrir conexão .</li>
                     <li>2. Aguarde, um novo QR Code será gerado.</li>
                     <li>3. Escaneie o seu novo QR Code</li>
                   </ol>
@@ -194,7 +190,7 @@ export const ManageSession = async () => {
                   <ol className="text-muted-foreground space-y-1 text-left text-sm">
                     <li>1. Abra o WhatsApp no seu celular</li>
                     <li>2. Vá em Menu → Dispositivos conectados</li>
-                    <li>3. Toque em "Conectar um dispositivo"</li>
+                    <li>3. Toque em → Conectar um dispositivo</li>
                     <li>4. Aponte o celular para esta tela</li>
                   </ol>
                 </div>
@@ -263,7 +259,7 @@ export const ManageSession = async () => {
               <ol className="text-muted-foreground space-y-1 text-left text-sm">
                 <li>1. Abra o WhatsApp no seu celular</li>
                 <li>2. Vá em Menu → Dispositivos conectados</li>
-                <li>3. Toque em "Conectar um dispositivo"</li>
+                <li>3. Toque em → Conectar um dispositivo</li>
                 <li>4. Aponte o celular para esta tela</li>
               </ol>
             </div>

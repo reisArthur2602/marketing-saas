@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -27,7 +27,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-import { Calendar, MessageSquare, Tags, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import {
   createExceptionSchema,
   CreateExceptionSchemaForm,

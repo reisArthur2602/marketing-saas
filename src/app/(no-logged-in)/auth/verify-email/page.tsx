@@ -1,21 +1,18 @@
-"use client";
-
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Mail } from "lucide-react";
-
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { redirect } from "next/navigation";
 
-const VerifyEmail = () => {
-  const searchParams = useSearchParams();
-  const email = searchParams.get("email");
-  const router = useRouter();
+interface VerifyEmailProps {
+  searchParams: Promise<{ email?: string }>;
+}
 
-  if (!email) router.push("/app");
-  if (!email) return null;
+const VerifyEmailPage = async ({ searchParams }: VerifyEmailProps) => {
+  const { email } = await searchParams;
 
+  if (!email) redirect("/auth");
   return (
     <main className="flex flex-1 items-center justify-center p-6 md:p-10">
       <Card className="w-full max-w-md shadow-lg">
@@ -64,4 +61,4 @@ const VerifyEmail = () => {
   );
 };
 
-export default VerifyEmail;
+export default VerifyEmailPage;
