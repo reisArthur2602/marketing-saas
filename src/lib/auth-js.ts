@@ -8,7 +8,9 @@ import { cache } from "react";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
-    Google,
+    Google({
+      allowDangerousEmailAccountLinking: true,
+    }),
     Nodemailer({
       server: process.env.EMAIL_SERVER,
       from: process.env.EMAIL_FROM,
@@ -22,6 +24,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
+
   trustHost: true,
   secret: process.env.AUTH_SECRET!,
 });
