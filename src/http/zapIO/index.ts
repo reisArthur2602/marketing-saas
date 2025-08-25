@@ -1,11 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { createWhatsAppSession } from "@/app/(logged-in)/dashboard/session/actions/create-whatsapp-session";
-import { axiosConfig } from "@/lib/axios";
-
 type ZapIOResponse<T> =
-  | { success: true; data: T; message: string }
+  | { success: true; data: T; message: string | null }
   | { success: false; data: null; message: string };
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 const sendMessage = async ({
   message,
@@ -17,17 +16,18 @@ const sendMessage = async ({
   sessionId: string;
 }): Promise<ZapIOResponse<void>> => {
   try {
-    await axiosConfig.post(
-      "/send",
-      { to, message },
-      { headers: { Authorization: sessionId } },
-    );
+    const res = await fetch(`${API_BASE}/send`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: sessionId,
+      },
+      body: JSON.stringify({ to, message }),
+    });
 
-    return {
-      success: true,
-      data: undefined,
-      message: "Mensagem enviada com sucesso!",
-    };
+    if (!res.ok) throw new Error("Erro HTTP");
+
+    return { success: true, data: undefined, message: null };
   } catch (err) {
     console.error("Erro ao enviar mensagem:", err);
     return { success: false, data: null, message: "Erro ao enviar mensagem" };
@@ -35,19 +35,24 @@ const sendMessage = async ({
 };
 
 const connectSession = async (): Promise<
-  ZapIOResponse<{ sessionId: string }>
+  ZapIOResponse<{ sessionId: string; name: string }>
 > => {
   try {
     const name = `sender.io-${uuidv4()}`;
-    const response = (
-      await axiosConfig.post<{ sessionId: string }>("/", { name })
-    ).data;
 
-    await createWhatsAppSession({ name, sessionId: response.sessionId });
+    const res = await fetch(`${API_BASE}/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+
+    if (!res.ok) throw new Error("Erro HTTP");
+
+    const response: { sessionId: string } = await res.json();
 
     return {
       success: true,
-      data: response,
+      data: { sessionId: response.sessionId, name },
       message: "Sessão conectada com sucesso!",
     };
   } catch (err) {
@@ -62,14 +67,19 @@ const configWebhook = async ({
   sessionId: string;
 }): Promise<ZapIOResponse<void>> => {
   try {
-    await axiosConfig.patch(
-      "/webhook",
-      {
+    const res = await fetch(`${API_BASE}/webhook`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: sessionId,
+      },
+      body: JSON.stringify({
         onReceive_webhookUrl: `${process.env.NEXT_PUBLIC_URL}/api/webhook/on-receive`,
         onChangeSession_webhookUrl: `${process.env.NEXT_PUBLIC_URL}/api/webhook/on-change-session`,
-      },
-      { headers: { Authorization: sessionId } },
-    );
+      }),
+    });
+
+    if (!res.ok) throw new Error("Erro HTTP");
 
     return {
       success: true,
@@ -92,7 +102,12 @@ const logout = async ({
   sessionId: string;
 }): Promise<ZapIOResponse<void>> => {
   try {
-    await axiosConfig.delete("/", { headers: { Authorization: sessionId } });
+    const res = await fetch(`${API_BASE}/`, {
+      method: "DELETE",
+      headers: { Authorization: sessionId },
+    });
+
+    if (!res.ok) throw new Error("Erro HTTP");
 
     return {
       success: true,

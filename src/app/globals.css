@@ -208,6 +208,6 @@
   }
 
   p {
-    @apply text-muted-foreground text-sm md:text-base;
+    @apply text-muted-foreground text-sm ;
   }
 }

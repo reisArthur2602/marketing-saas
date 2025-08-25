@@ -3,14 +3,14 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-type AutoRefreshProps = {
+interface AutoRefreshProps {
   active: boolean;
   intervalMs?: number;
-};
+}
 
 export const AutoRefresh = ({
   active,
-  intervalMs = 2000,
+  intervalMs = 5000,
 }: AutoRefreshProps) => {
   const router = useRouter();
 

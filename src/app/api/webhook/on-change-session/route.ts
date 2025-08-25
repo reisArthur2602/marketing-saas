@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
-
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 interface UpdateSessionProps {
   sessionId: string;
@@ -10,6 +9,7 @@ interface UpdateSessionProps {
 }
 
 const updateSession = async (data: UpdateSessionProps) => {
+  "use server";
   await prisma.whatsAppSession.update({
     where: {
       sessionId: data.sessionId,
@@ -19,6 +19,7 @@ const updateSession = async (data: UpdateSessionProps) => {
       qrCode: data.qrCode,
     },
   });
+
   revalidatePath("/dashboard/session");
 };
 
@@ -30,9 +31,10 @@ interface Body {
   };
 }
 
-export const POST = async (request: NextRequest) => {
+export async function POST(request: NextRequest) {
   try {
-    const { session } = (await request.json()) as Body;
+    const body: Body = await request.json();
+    const { session } = body;
 
     if (!session) return NextResponse.json({ success: false }, { status: 400 });
 
@@ -43,9 +45,8 @@ export const POST = async (request: NextRequest) => {
     });
 
     return NextResponse.json({ success: true }, { status: 200 });
-    
   } catch (error) {
     console.error(error);
     return NextResponse.json({ success: false }, { status: 500 });
   }
-};
+}
