@@ -3,7 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WhatsAppSession } from "@prisma/client";
 
 import { Button } from "@/components/ui/button";
-import { Loader2, QrCode, Smartphone, WifiOffIcon } from "lucide-react";
+import {
+  Loader,
+  Loader2,
+  LoaderCircle,
+  QrCode,
+  QrCodeIcon,
+  Smartphone,
+  WifiOffIcon,
+} from "lucide-react";
 import { ScanAnimation } from "@/components/shared/scan-animation/scan-animation";
 
 import { formatDate, timeAgo } from "@/utils/date";
@@ -13,6 +21,7 @@ import { logoutSession } from "../actions/logout-session";
 import generateQRCode from "qrcode";
 import Image from "next/image";
 import { AutoRefresh } from "@/components/shared/auto-refresh";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ManageSessionProps {
   session: WhatsAppSession | null;
@@ -58,13 +67,32 @@ export const ManageSession = async ({ session }: ManageSessionProps) => {
             <CardTitle>Conectar via QR Code</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex justify-center">
-              <div className="border-muted-foreground/30 bg-muted flex size-60 items-center justify-center rounded-lg border-2 border-dashed">
-                <div className="space-y-2 text-center">
-                  <QrCode className="mx-auto size-14" />
-                  <p>Seu QR Code aparecerá aqui</p>
+            <div className="bg-card border-border flex h-64 w-full items-center justify-center rounded-lg border-2 border-dashed">
+              <div className="space-y-3 text-center">
+                <div className="bg-muted flex h-48 w-48 items-center justify-center rounded-lg">
+                  <div className="grid grid-cols-4 gap-1">
+                    {Array.from({ length: 16 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className={`size-3 rounded-sm ${
+                          Math.random() > 0.5 && "bg-primary"
+                        }`}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
+            </div>
+
+            <div className="space-y-4 text-center">
+              <h3>O QR Code aparecerá aqui</h3>
+
+              <ol className="text-muted-foreground space-y-1 text-left text-sm">
+                <li>1. Abra o WhatsApp no seu celular</li>
+                <li>2. Vá em Menu → Dispositivos conectados</li>
+                <li>3. Toque em "Conectar um dispositivo"</li>
+                <li>4. Aponte o celular para esta tela</li>
+              </ol>
             </div>
           </CardContent>
         </Card>
@@ -104,8 +132,26 @@ export const ManageSession = async ({ session }: ManageSessionProps) => {
             <CardTitle>Conectar via QR Code</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="mx-auto w-fit">
-              <ScanAnimation />
+            <div className="bg-card border-border flex h-64 w-full items-center justify-center rounded-lg border-2 border-dashed">
+              <div className="space-y-3 text-center">
+                <Skeleton className="flex h-48 w-48 items-center justify-center">
+                  <QrCode className="text-primary size-32" />
+                </Skeleton>
+              </div>
+            </div>
+
+            <div className="space-y-4 text-center">
+              <div className="flex items-center justify-center gap-2">
+                <LoaderCircle className="text-primary animate-spin" />
+                <h3 className="font-medium">Aguardando conexão</h3>
+              </div>
+
+              <ol className="text-muted-foreground space-y-1 text-left text-sm">
+                <li>1. Abra o WhatsApp no seu celular</li>
+                <li>2. Vá em Menu → Dispositivos conectados</li>
+                <li>3. Toque em "Conectar um dispositivo"</li>
+                <li>4. Aponte o celular para esta tela</li>
+              </ol>
             </div>
           </CardContent>
         </Card>
@@ -126,7 +172,7 @@ export const ManageSession = async ({ session }: ManageSessionProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent className="flex h-full flex-col gap-4">
-            <AutoRefresh active intervalMs={10000} />
+            <AutoRefresh active intervalMs={8000} />
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Estado:</span>
@@ -147,29 +193,34 @@ export const ManageSession = async ({ session }: ManageSessionProps) => {
           <CardHeader>
             <CardTitle>Conectar via QR Code</CardTitle>
           </CardHeader>
+
           <CardContent className="space-y-4">
-            {qrCode && (
-              <>
-                <AutoRefresh active />
-                <Image
-                  src={qrCode}
-                  alt="conectar qr-code"
-                  width={256}
-                  height={256}
-                  priority
-                  className="mx-auto rounded-lg"
-                />
-                <div className="space-y-2 text-center">
-                  <h3>Escaneie o QR Code</h3>
-                  <ol className="text-muted-foreground space-y-2 text-left text-sm">
-                    <li>1. Abra o WhatsApp no seu celular</li>
-                    <li>2. Vá em Menu → Dispositivos conectados</li>
-                    <li>3. Toque em {"Conectar um dispositivo"}</li>
-                    <li>4. Aponte o celular para esta tela</li>
-                  </ol>
-                </div>
-              </>
-            )}
+            <div className="bg-card border-border flex h-64 w-full items-center justify-center rounded-lg border-2 border-dashed">
+              {qrCode && (
+                <>
+                  <AutoRefresh active />
+                  <Image
+                    src={qrCode}
+                    alt="conectar qr-code"
+                    width={256}
+                    height={256}
+                    priority
+                    className="mx-auto size-48 rounded-lg"
+                  />
+                </>
+              )}
+            </div>
+
+            <div className="space-y-4 text-center">
+              <h3 className="font-medium">Escaneie o QR Code</h3>
+
+              <ol className="text-muted-foreground space-y-1 text-left text-sm">
+                <li>1. Abra o WhatsApp no seu celular</li>
+                <li>2. Vá em Menu → Dispositivos conectados</li>
+                <li>3. Toque em "Conectar um dispositivo"</li>
+                <li>4. Aponte o celular para esta tela</li>
+              </ol>
+            </div>
           </CardContent>
         </Card>
       </section>
