@@ -2,7 +2,9 @@
 
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { ArrowRight, FileQuestion, Home } from "lucide-react";
+
 import Link from "next/link";
 
 const NotFoundPage = () => {
@@ -25,7 +27,7 @@ const NotFoundPage = () => {
               </p>
             </div>
 
-            <Link href="/auth" className={buttonVariants()}>
+            <Link href="/auth" className={cn(buttonVariants(), "w-full")}>
               Voltar ao início <ArrowRight className="mr-2" />
             </Link>
           </div>

@@ -2,7 +2,9 @@
 
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { AlertTriangle, ArrowRight } from "lucide-react";
+import { Metadata } from "next";
 import Link from "next/link";
 
 const ErrorPage = () => {
@@ -26,7 +28,7 @@ const ErrorPage = () => {
               </p>
             </div>
 
-            <Link href="/auth" className={buttonVariants()}>
+            <Link href="/auth" className={cn(buttonVariants(), "w-full")}>
               Voltar ao início <ArrowRight className="mr-2" />
             </Link>
           </div>

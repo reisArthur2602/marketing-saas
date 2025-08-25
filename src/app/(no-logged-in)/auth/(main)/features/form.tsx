@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/auth-js";
 import { Chrome, Mail } from "lucide-react";
+import { redirect } from "next/navigation";
 
 type Provider = "google" | "nodemailer";
 
@@ -16,11 +17,14 @@ export const AuthForm = () => {
     switch (provider) {
       case "google":
         await signIn(provider, { redirectTo: "/dashboard" });
-        break;
+        return;
       case "nodemailer":
         const email = form.get("email") as string;
-        await signIn(provider, { email, redirectTo: "/dashboard" });
-        break;
+        await signIn(provider, {
+          email,
+          redirect: false,
+        });
+        redirect(`/auth/verify-email?email=${email}`);
     }
   };
 
