@@ -1,6 +1,8 @@
 import { zapIO } from "@/http/zapIO";
 import { prisma } from "@/lib/prisma";
 import { normalizeText } from "@/utils/normalize-text";
+import { Lead } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { cache } from "react";
 
@@ -26,36 +28,51 @@ const saveMessage = async ({
   userId,
   messageId,
   keywordId,
-  content,
+  content,leadId
 }: {
   phone: string;
   userId: string;
   messageId: string;
   keywordId: string;
   content: string;
+  leadId:string
 }) => {
   await prisma.messageLog.create({
-    data: { phone, userId, messageId, keywordId, content },
+    data: { phone, userId, messageId, keywordId, content,leadId},
   });
 };
 
+
+const saveLead = async({
+  name,
+  phone,
+  userId,
+}: {
+  name: string;
+  phone: string;
+  userId: string;
+  
+}) => {
+revalidatePath('/dashboard/leads')
+return await prisma.lead.create({data:{name,userId,phone}})
+}
 interface Body {
   text?: { message: string };
   sessionId: string;
   phone: string;
   messageId: string;
+  senderName:string
 }
 
 export const POST = async (request: NextRequest) => {
   try {
     const body = (await request.json()) as Body;
-    const { text, sessionId, phone, messageId } = body;
+    const { text, sessionId, phone, messageId ,senderName} = body;
 
     if (!text || !sessionId || !phone || !messageId)
       return NextResponse.json({ success: true }, { status: 200 });
 
     const session = await findSession({ sessionId });
-
     if (!session) return NextResponse.json({ success: false }, { status: 400 });
 
     let responseMessage =
@@ -64,6 +81,7 @@ export const POST = async (request: NextRequest) => {
     const campaigns = await findCampaigns({
       userId: session.userId,
     });
+
     const hasCampaign = campaigns.length > 0;
     const now = new Date();
     const today = now.getDay();
@@ -77,7 +95,6 @@ export const POST = async (request: NextRequest) => {
         if (!keywordFound) continue;
 
         const isDayValid = campaign.daysOfWeek.includes(today);
-
         const hasException = campaign.exceptions.some((ex) => {
           const exDate = new Date(ex.date);
           return (
@@ -104,26 +121,42 @@ export const POST = async (request: NextRequest) => {
           sessionId,
         });
 
-        await saveMessage({
-          content: text.message,
-          keywordId: keywordFound.id,
-          messageId,
-          phone,
-          userId: session.userId,
-        });
 
+    let lead = await prisma.lead.upsert({
+  where: { phone },
+  create: { name: senderName || "Desconhecido", phone, userId: session.userId },
+  update: {},
+});
+
+if (!lead) {
+  console.log("Lead não encontrado, criando novo...");
+  lead = await saveLead({ name: senderName || "Desconhecido", phone, userId: session.userId });
+}
+
+    await saveMessage({
+      content: text.message,
+      keywordId: keywordFound?.id, 
+      messageId,
+      phone,
+      userId: session.userId,
+      leadId: lead.id,
+    });
+      
+  
+        
         return NextResponse.json({ success: true }, { status: 200 });
       }
     }
 
     const fallbackMessage = session.user.defaultFallbackMessage;
-    if (fallbackMessage) {
+
+    if (fallbackMessage) 
       await zapIO.sendMessage({
         message: fallbackMessage,
         to: phone,
         sessionId,
       });
-    }
+    
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {

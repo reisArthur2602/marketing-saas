@@ -20,6 +20,7 @@ const CampaignsPage = async () => {
   const { campaigns, availableKeywords, exceptions, keywords, templates } =
     await getCampaignsData();
 
+    console.log(campaigns,availableKeywords,exceptions,templates,keywords)
   return (
     <div className="flex-1 space-y-6">
       <div className="flex items-center justify-between">

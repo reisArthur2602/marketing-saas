@@ -15,6 +15,7 @@ const navigationLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/dashboard/campaigns", label: "Campanhas" },
   { href: "/dashboard/templates", label: "Templates" },
+  { href: "/dashboard/lead", label: "Leads" },
   { href: "/dashboard/session", label: "Sessão" },
 ];
 
