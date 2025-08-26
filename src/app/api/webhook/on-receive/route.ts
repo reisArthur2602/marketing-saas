@@ -14,12 +14,12 @@ const findSession = cache(async ({ sessionId }: { sessionId: string }) => {
   });
 });
 
-const findCampaigns = cache(async ({ userId }: { userId: string }) => {
+const findCampaigns = async ({ userId }: { userId: string }) => {
   return prisma.campaign.findMany({
     where: { userId, isActive: true },
     include: { template: true, exceptions: true, keywords: true },
   });
-});
+};
 
 const saveMessage = async ({
   phone,

@@ -1,3 +1,5 @@
+export const revalidate = 10000;
+
 import { Button } from "@/components/ui/button";
 import { CalendarX, Send, SendIcon, Settings } from "lucide-react";
 

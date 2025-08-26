@@ -1,3 +1,6 @@
+export const revalidate = 10000
+
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, MessageSquare } from "lucide-react";
 import { Metadata } from "next";

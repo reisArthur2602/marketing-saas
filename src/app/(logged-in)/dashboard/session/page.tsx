@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Sessão | Sender.io",
 };
 
-const SessionPage = async () => {
+const SessionPage = () => {
   return (
     <div className="flex-1 space-y-6">
       <div>
